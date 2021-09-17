@@ -68,35 +68,35 @@ class Role extends Resource
     public function fields(Request $request)
     {
         $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
-
+        $permissions = config('permission.permissions.resource');
         foreach (Nova::$resources as $resource) {
             if($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
             }
-            $resourceName = strtolower(substr(strrchr($resource, "\\"), 1));
-            $resourcePermissions = [
-                "viewAny $resourceName"         => "viewAny $resourceName",
-                "create $resourceName"          => "create $resourceName",
-                "update $resourceName"          => "update $resourceName",
-                "view $resourceName"            => "view $resourceName",
-                "delete $resourceName"          => "delete $resourceName",
-                "force delete $resourceName"    => "force delete $resourceName",
-                "restore $resourceName"         => "restore $resourceName",
-                "attach $resourceName"          => "attach $resourceName",
-                "detach $resourceName"          => "detach $resourceName"
-            ];
+            // $resourceName = strtolower(substr(strrchr($resource, "\\"), 1));
+            // if ($resource)
+            $resourceName = $resource::label();
+
+            foreach ($permissions as $permission) {
+                $value = "$permission-$resourceName";
+                $resourcePermissions[$value] = $value;
+            }
+
             // add resource actions
             $object = new $resource($resource::$model);
             foreach ($object->actions($request) as $action) {
                 if($action->name) {
-                    $resourcePermissions[$action->name] = $action->name;
+                    $name = $action->name . "-$resourceName";
+                    $resourcePermissions[$name] = $name;
                 }
             }
             foreach ($resourcePermissions as $resourcePermission) {
-                $dbPermision = \DigitalCloud\PermissionTool\Models\Permission::firstOrCreate(
+                \DigitalCloud\PermissionTool\Models\Permission::firstOrCreate(
                     ['name' => $resourcePermission], ['guard_name' => 'web']
                 );
             }
+
+            \DigitalCloud\PermissionTool\Models\Permission::whereNotIn('name', array_keys($resourcePermissions))->delete();
         }
 
         $fields =  [

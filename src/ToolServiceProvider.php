@@ -30,6 +30,11 @@ class ToolServiceProvider extends ServiceProvider
             $this->routes();
         });
 
+        $this->publishes([
+            __DIR__.'/config/permission.php' => config_path('permission.php'),
+        ]);
+
+
         Gate::policy(config('permission.models.permission'), PermissionPolicy::class);
         Gate::policy(config('permission.models.role'), RolePolicy::class);
         

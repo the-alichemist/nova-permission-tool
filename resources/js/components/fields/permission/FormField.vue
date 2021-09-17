@@ -1,9 +1,9 @@
 <template>
-    <default-field :field="field">
-        <template slot="field">
+    <default-field :field="field" class="w-4/5">
+        <template slot="field" class="w-4/5">
             <div class="flex flex-wrap content-start " >
-                <div v-for="group in availableGroups" class="flex items-center w-1/3">
-                    <fieldset class="w-full p-2 m-1">
+                <div v-for="group in availableGroups" :key="group.name" class="flex items-center w-1/3 mb-2">
+                    <fieldset class="w-full p-2 m-1 h-full">
                         <legend class="mx-1 px-1">
                             <div class="flex">
                                 <checkbox
@@ -18,18 +18,38 @@
 
                         </legend>
 
-                        <div v-for="option in group.options" @click="handleChange(option.value)" class="flex ">
-                            <checkbox
-                            class="py-2 mr-4"
-                            :id="field.name"
-                            :name="field.name"
-                            :checked="options[option.value]"
-                            ></checkbox>
-                            <label
-                            :for="field.name"
-                            v-text="option.display"
-
-                            ></label>
+                        <div v-for="option in group.options" :key="option.value" @click="handleChange(option.value)" class="flex  mb-1">
+                            <div>
+                                <checkbox
+                                class="py-2 mr-4"
+                                :id="field.name"
+                                :name="field.name"
+                                :checked="options[option.value]"
+                                ></checkbox>
+                                <label
+                                :for="field.name"
+                                v-text="option.display"
+                                ></label>
+                            </div>
+                        </div>
+                        <div v-if="group.actions.length > 0">
+                            <h4>Actions</h4>
+                            <hr class="border-t">
+                        
+                            <div v-for="option in group.actions" :key="option.value" @click="handleChange(option.value)" class="flex mb-1">
+                                <div>
+                                    <checkbox
+                                    class="py-2 mr-4"
+                                    :id="field.name"
+                                    :name="field.name"
+                                    :checked="options[option.value]"
+                                    ></checkbox>
+                                    <label
+                                    :for="field.name"
+                                    v-text="option.display"
+                                    ></label>
+                                </div>
+                            </div>
                         </div>
                     </fieldset>
                 </div>
@@ -54,13 +74,16 @@ export default {
         availableGroups() {
             var groups = {}
             this.field.options.forEach(option => {
-                if (groups[option.resource]) {
-                    groups[option.resource].options.push(option)
+                if (!groups[option.resource]) {
+                    groups[option.resource] = {name: option.resource, options: [], actions: []};
                 }
-                else {
-                    groups[option.resource] = {name: option.resource, options: [option]}
+                if (option.action) {
+                    groups[option.resource].actions.push(option);
+                } else {
+                    groups[option.resource].options.push(option);
                 }
             })
+            console.log(groups);
             return _.toArray(groups)
 
         },

@@ -97,4 +97,26 @@ return [
      */
 
     'display_permission_in_exception' => false,
+
+    /*
+     * Permissions to be created for each resource
+     * `view` permission maps to each resource name like `view-users`
+     */
+
+    'permissions' => [
+        'resource' => [
+            'viewAny',
+            'create',
+            'update',
+            'view',
+            'delete',
+            'forceDelete',
+            'restore',
+            'attach',
+            'detach',
+        ],
+        'exclude_resources' => [
+            
+        ]
+    ],
 ];

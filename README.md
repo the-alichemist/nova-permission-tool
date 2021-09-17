@@ -1,8 +1,11 @@
+# On-Going Development with constant Breaking Changes - Fork Not Stable
+
 # Nova Permission Tool.
 
 This tool allows you to create and manage rules and permissions for nova resources. After installation, the default nova resource permissions will be generated for all available resources and resource actions.
 
 # Requirements & Dependencies
+
 This tool uses [Spatie Permission](https://github.com/spatie/laravel-permission) package.
 
 ## Installation
@@ -55,11 +58,11 @@ namespace App\Nova\Actions;
 use Laravel\Nova\Actions\Action;
 
 class YourAction extends Action {
-    
+
     // ...
 
     public $name = 'send email';
-    
+
     // ...
 
 }
@@ -79,9 +82,9 @@ use Illuminate\Http\Request;
 
 
 class Quotation extends Resource {
-    
+
     // ...
-    
+
     public function actions(Request $request) {
         return [
             (new YourAction())->canSee(function ($request) {
@@ -91,11 +94,12 @@ class Quotation extends Resource {
             })
         ];
     }
-    
+
     // ...
 }
 
 ```
 
 ## Images
+
 ![per](https://user-images.githubusercontent.com/41853913/50079673-e1971880-01f2-11e9-9e45-d9c0c7e1b861.PNG)
