@@ -105,18 +105,20 @@ return [
 
     'permissions' => [
         'resource' => [
-            'viewAny',
             'create',
-            'update',
             'view',
+            'viewAny',
+            'update',
+            'updateAny',
             'delete',
+            'deleteAny',
             'forceDelete',
             'restore',
             'attach',
             'detach',
         ],
         'exclude_resources' => [
-            
+
         ]
     ],
 ];
