@@ -74,12 +74,11 @@ class Role extends Resource
                 continue;
             }
             // $resourceName = strtolower(substr(strrchr($resource, "\\"), 1));
-            // if ($resource)
-            $resourceName = $resource::label();
+            $resourceName = $resource;
 
             foreach ($permissions as $permission) {
                 $value = "$permission-$resourceName";
-                $resourcePermissions[$value] = $value;
+                $resourcePermissions[] = $value;
             }
 
             // add resource actions
@@ -87,17 +86,16 @@ class Role extends Resource
             foreach ($object->actions($request) as $action) {
                 if($action->name) {
                     $name = $action->name . "-$resourceName";
-                    $resourcePermissions[$name] = $name;
+                    $resourcePermissions[] = $name;
                 }
             }
-            foreach ($resourcePermissions as $resourcePermission) {
-                \DigitalCloud\PermissionTool\Models\Permission::firstOrCreate(
-                    ['name' => $resourcePermission], ['guard_name' => 'web']
-                );
-            }
-
-            \DigitalCloud\PermissionTool\Models\Permission::whereNotIn('name', array_keys($resourcePermissions))->delete();
         }
+        foreach ($resourcePermissions as $resourcePermission) {
+            \DigitalCloud\PermissionTool\Models\Permission::firstOrCreate(
+                ['name' => $resourcePermission], ['guard_name' => 'web']
+            );
+        }
+        \DigitalCloud\PermissionTool\Models\Permission::whereNotIn('name', $resourcePermissions)->delete();
 
         $fields =  [
             ID::make()->sortable(),

@@ -81,6 +81,11 @@ return [
          * that case, name this `model_uuid`.
          */
         'model_morph_key' => 'model_id',
+
+        /**
+         * User foreign key in tables to check record ownership like $article->user_id == $user->id
+         */
+        'user_id' => 'user_id'
     ],
 
     /*

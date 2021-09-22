@@ -46,12 +46,14 @@ class Permission extends Field
     public function options() {
         return $this->withMeta([
             'options' => \DigitalCloud\PermissionTool\Models\Permission::get()->map(function ($permission) {
-                $p = substr($permission->name, 0, strrpos($permission->name, '-'));
-                $action = !in_array($p, config('permission.permissions.resource'));
+                $resourceMethod = substr($permission->name, 0, strrpos($permission->name, '-'));
+                $resourceClass = substr($permission->name, strrpos($permission->name, '-') + 1);
+
+                $action = !in_array($resourceMethod, config('permission.permissions.resource'));
                 return [
-                    'display' => Str::title(Str::snake($p, ' ')),
+                    'display' => Str::studly($p),
                     'value' => $permission->id,
-                    'resource' => substr($permission->name, strrpos($permission->name, '-') + 1),
+                    'resource' => $resourceClass::label(),
                     'action' => $action,
                 ];
             })->values()->all(),
