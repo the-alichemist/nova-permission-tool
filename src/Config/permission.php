@@ -122,6 +122,7 @@ return [
             'attach',
             'detach',
         ],
+        'admin_email' => 'example@example.com',
         'exclude_resources' => [
 
         ]

@@ -51,7 +51,7 @@ class Permission extends Field
 
                 $action = !in_array($resourceMethod, config('permission.permissions.resource'));
                 return [
-                    'display' => Str::studly($p),
+                    'display' => Str::studly($resourceMethod),
                     'value' => $permission->id,
                     'resource' => $resourceClass::label(),
                     'action' => $action,

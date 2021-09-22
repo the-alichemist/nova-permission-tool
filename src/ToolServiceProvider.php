@@ -39,11 +39,11 @@ class ToolServiceProvider extends ServiceProvider
         Gate::policy(config('permission.models.role'), RolePolicy::class);
         
         // Super admin all permissions
-        // Gate::before(function ($user, $ability) {
-        //     if ($user->email == 'mail@example.com') {
-        //         return true;
-        //     }
-        // });
+        Gate::before(function ($user, $ability) {
+            if ($user->email == config('permission.permissions.admin_email')) {
+                return true;
+            }
+        });
 
         Nova::serving(function (ServingNova $event) {
             //
