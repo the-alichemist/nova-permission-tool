@@ -86,13 +86,14 @@ class PermissionTool extends Tool
                 return $tool->renderNavigation() && !in_array(get_class($tool), [
                     'Laravel\Nova\Tools\Dashboard',
                     'Laravel\Nova\Tools\ResourceManager',
+                    "DigitalCloud\PermissionTool\PermissionTool"
                 ]);
             });
-            // $tools->each(function ($tool) {
-            //     $tool->canSee(function () use ($tool) {
-            //         return Gate::check(static::getToolPermission($tool));
-            //     });
-            // });
+            $tools->each(function ($tool) {
+                $tool->canSee(function () use ($tool) {
+                    return Gate::check(static::getToolPermission($tool));
+                });
+            });
         });
     }
 }

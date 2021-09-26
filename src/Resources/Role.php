@@ -137,6 +137,7 @@ class Role extends Resource
             return $tool->renderNavigation() && !in_array(get_class($tool), [
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
+                "DigitalCloud\PermissionTool\PermissionTool"
             ]);
         })->toArray();
         foreach ($tools as $tool) {
