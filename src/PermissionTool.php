@@ -63,8 +63,11 @@ class PermissionTool extends Tool
             if($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
             }
-
-            Gate::policy($resource::$model, AbstractPolicy::class);
+            $abstractPolicy = AbstractPolicy::class;
+            $anonymousPolicy = eval("return (new class extends $abstractPolicy {
+                public \$resource = '$resource';
+            });");
+            Gate::policy($resource::$model, get_class($anonymousPolicy));
         }
     }
 
@@ -73,9 +76,6 @@ class PermissionTool extends Tool
      * @return String
      */
     public static function getToolPermission($tool) {
-        if (is_string($tool)) {
-            return sprintf('%s-Laravel\Nova\Tool', $tool);
-        }
         return sprintf('%s-Laravel\Nova\Tool', get_class($tool));
     }
 
@@ -88,11 +88,11 @@ class PermissionTool extends Tool
                     'Laravel\Nova\Tools\ResourceManager',
                 ]);
             });
-            $tools->each(function ($tool) {
-                $tool->canSee(function ($request) use ($tool) {
-                    return Gate::check(static::getToolPermission($tool));
-                });
-            });
+            // $tools->each(function ($tool) {
+            //     $tool->canSee(function () use ($tool) {
+            //         return Gate::check(static::getToolPermission($tool));
+            //     });
+            // });
         });
     }
 }

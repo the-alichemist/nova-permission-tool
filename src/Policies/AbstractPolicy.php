@@ -11,10 +11,12 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class AbstractPolicy
 {
     use HandlesAuthorization;
-    
+    public $resource;
+
     public function resourceClass()
     {
-        return Nova::resourceForKey(request()->route('resource'));
+        // return Nova::resourceForKey(request()->route('resource'));
+        return $this->resource;
     }
     
     public function check($permission, $recordOwnership = false)

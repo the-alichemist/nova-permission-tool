@@ -138,8 +138,6 @@ class Role extends Resource
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
             ]);
-        })->map(function ($tool) {
-            return get_class($tool);
         })->toArray();
         foreach ($tools as $tool) {
             $this->rolePermissions[] = PermissionTool::getToolPermission($tool);
