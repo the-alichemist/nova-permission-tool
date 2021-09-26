@@ -36,7 +36,7 @@ class ToolServiceProvider extends ServiceProvider
 
         // Super admin all permissions
         Gate::before(function ($user, $ability) {
-            if (in_array($user->email, config('permission.permissions.admin_email'))) {
+            if (in_array($user->email, config('permission.permissions.admin_emails'))) {
                 return true;
             }
         });
