@@ -61,9 +61,9 @@ class PermissionTool extends Tool
     {
         $abstractPolicy = AbstractPolicy::class;
         $resources = Nova::$resources;
-        $resources[] = config('permission.models.permission');
-        $resources[] = config('permission.models.role');
-
+        $resources[] = 'DigitalCloud\PermissionTool\Resources\Role';
+        $resources[] = 'DigitalCloud\PermissionTool\Resources\Permission';
+        
         foreach ($resources as $resource) {
             if($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
