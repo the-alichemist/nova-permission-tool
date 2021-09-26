@@ -34,13 +34,9 @@ class ToolServiceProvider extends ServiceProvider
             __DIR__.'/config/permission.php' => config_path('permission.php'),
         ]);
 
-
-        Gate::policy(config('permission.models.permission'), PermissionPolicy::class);
-        Gate::policy(config('permission.models.role'), RolePolicy::class);
-        
         // Super admin all permissions
         Gate::before(function ($user, $ability) {
-            if ($user->email == config('permission.permissions.admin_email')) {
+            if (in_array($user->email, config('permission.permissions.admin_email'))) {
                 return true;
             }
         });

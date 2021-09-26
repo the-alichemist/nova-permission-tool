@@ -59,11 +59,15 @@ class PermissionTool extends Tool
 
     public function registerPolicies()
     {
-        foreach (Nova::$resources as $resource) {
+        $abstractPolicy = AbstractPolicy::class;
+        $resources = Nova::$resources;
+        $resources[] = config('permission.models.permission');
+        $resources[] = config('permission.models.role');
+
+        foreach ($resources as $resource) {
             if($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
             }
-            $abstractPolicy = AbstractPolicy::class;
             $anonymousPolicy = eval("return (new class extends $abstractPolicy {
                 public \$resource = '$resource';
             });");

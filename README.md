@@ -2,7 +2,7 @@
 
 # Nova Permission Tool.
 
-This tool allows you to create and manage rules and permissions for nova resources. After installation, the default nova resource permissions will be generated for all available resources and resource actions.
+This tool allows you to create and manage rules and permissions for nova resources, actions & tools. After installation, the default nova resource permissions will be generated for all available resources and resource actions as well as global Nova Tools
 
 # Requirements & Dependencies
 
@@ -30,7 +30,7 @@ php artisan migrate
 
 ## Usage
 
-You must register the tool with Nova. This is typically done in the tools method of the NovaServiceProvider, in app/Providers/NovaServiceProvider.php.
+1. You must register the tool with Nova. This is typically done in the tools method of the NovaServiceProvider, in app/Providers/NovaServiceProvider.php.
 
 ```php
 
@@ -54,7 +54,9 @@ public function tools()
 
 ```
 
-To allow the tool to generate permissions actions, you need to se the name of the action. Actions with no names will not be generated automatically.
+2. Specify SuperAdmins who can access permissions without being allocated any permissions in config('permission.permissions.admin_emails')
+
+3. To allow the tool to generate permissions actions, you need to se the name of the action. Actions with no names will not be generated automatically.
 
 ```php
 <?php
@@ -75,7 +77,7 @@ class YourAction extends Action {
 
 ```
 
-and then in the resource you can authorize the action:
+4. and then in the resource you can authorize the action:
 
 ```php
 <?php
