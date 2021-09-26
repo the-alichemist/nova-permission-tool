@@ -37,6 +37,12 @@ You must register the tool with Nova. This is typically done in the tools method
 use DigitalCloud\PermissionTool\PermissionTool;
 // ....
 
+public function boot()
+{
+    // ...
+    PermissionTool::register();
+}
+
 public function tools()
 {
     return [

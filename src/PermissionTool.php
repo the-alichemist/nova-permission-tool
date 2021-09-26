@@ -4,6 +4,7 @@ namespace DigitalCloud\PermissionTool;
 
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
+use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\Facades\Gate;
 use DigitalCloud\PermissionTool\Resources\Role;
 use DigitalCloud\PermissionTool\Resources\Permission;
@@ -65,5 +66,33 @@ class PermissionTool extends Tool
 
             Gate::policy($resource::$model, AbstractPolicy::class);
         }
+    }
+
+    /**
+     * @param String $tool
+     * @return String
+     */
+    public static function getToolPermission($tool) {
+        if (is_string($tool)) {
+            return sprintf('%s-Laravel\Nova\Tool', $tool);
+        }
+        return sprintf('%s-Laravel\Nova\Tool', get_class($tool));
+    }
+
+    public static function register()
+    {
+        Nova::serving(function (ServingNova $event) {
+            $tools = collect(Nova::$tools)->filter(function ($tool) {
+                return $tool->renderNavigation() && !in_array(get_class($tool), [
+                    'Laravel\Nova\Tools\Dashboard',
+                    'Laravel\Nova\Tools\ResourceManager',
+                ]);
+            });
+            $tools->each(function ($tool) {
+                $tool->canSee(function ($request) use ($tool) {
+                    return Gate::check(static::getToolPermission($tool));
+                });
+            });
+        });
     }
 }

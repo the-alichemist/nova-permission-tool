@@ -2,12 +2,10 @@
 
 namespace DigitalCloud\PermissionTool\Resources;
 
-use App\Rules\HasPermission;
-use DigitalCloud\CheckboxList\CheckboxList;
-use Fourstacks\NovaCheckboxes\Checkboxes;
-use Laravel\Nova\Nova;
 use App\Nova\Resource;
+use Laravel\Nova\Nova;
 use Laravel\Nova\Fields\ID;
+use App\Rules\HasPermission;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
 use Illuminate\Validation\Rule;
@@ -15,7 +13,10 @@ use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Fields\BelongsToMany;
+use Fourstacks\NovaCheckboxes\Checkboxes;
 use Spatie\Permission\PermissionRegistrar;
+use DigitalCloud\CheckboxList\CheckboxList;
+use DigitalCloud\PermissionTool\PermissionTool;
 
 class Role extends Resource
 {
@@ -70,6 +71,7 @@ class Role extends Resource
     public function fields(Request $request)
     {
         $this->setupPermission();
+        $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
 
         $fields =  [
             ID::make()->sortable(),
@@ -104,7 +106,6 @@ class Role extends Resource
 
     protected function setupResourcePermissions()
     {
-        $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
         $resourcePermissions = config('permission.permissions.resource');
         foreach (Nova::$resources as $resource) {
             if($resource == 'Laravel\Nova\Actions\ActionResource') {
@@ -120,7 +121,7 @@ class Role extends Resource
 
             // add resource actions
             $object = new $resource($resource::$model);
-            foreach ($object->actions($request) as $action) {
+            foreach ($object->actions(request()) as $action) {
                 if($action->name) {
                     $name = $action->name . "-$resource";
                     $this->rolePermissions[] = $name;
@@ -133,20 +134,26 @@ class Role extends Resource
     protected function setupToolPermissions()
     {
         $tools = collect(Nova::$tools)->filter(function ($tool) {
-            return $tool->renderNavigation() && !in_array($tool, [
+            return $tool->renderNavigation() && !in_array(get_class($tool), [
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
             ]);
+        })->map(function ($tool) {
+            return get_class($tool);
         })->toArray();
+        foreach ($tools as $tool) {
+            $this->rolePermissions[] = PermissionTool::getToolPermission($tool);
+        }
+    }
+
+
+    protected function syncPermissions()
+    {
         foreach ($this->rolePermissions as $resourcePermission) {
             \DigitalCloud\PermissionTool\Models\Permission::firstOrCreate(
                 ['name' => $resourcePermission], ['guard_name' => 'web']
             );
         }
-    }
-
-    protected function syncPermissions()
-    {
         \DigitalCloud\PermissionTool\Models\Permission::whereNotIn('name', $this->rolePermissions)->delete();
     }
 

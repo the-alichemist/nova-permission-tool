@@ -46,14 +46,22 @@ class Permission extends Field
     public function options() {
         return $this->withMeta([
             'options' => \DigitalCloud\PermissionTool\Models\Permission::get()->map(function ($permission) {
-                $resourceMethod = substr($permission->name, 0, strrpos($permission->name, '-'));
+                $permissionDisplay = substr($permission->name, 0, strrpos($permission->name, '-'));
                 $resourceClass = substr($permission->name, strrpos($permission->name, '-') + 1);
+                $action = !in_array($permissionDisplay, config('permission.permissions.resource'));
+                
+                if ($resourceClass == 'Laravel\Nova\Tool') {
+                    $group = 'Tools';
+                    $permissionDisplay = substr($permissionDisplay, strrpos($permissionDisplay, '\\') + 1);
+                    $action = false;
+                } else {
+                    $group = $resourceClass::label();
+                }
 
-                $action = !in_array($resourceMethod, config('permission.permissions.resource'));
                 return [
-                    'display' => Str::studly($resourceMethod),
+                    'display' => Str::studly($permissionDisplay),
                     'value' => $permission->id,
-                    'resource' => $resourceClass::label(),
+                    'resource' => $group,
                     'action' => $action,
                 ];
             })->values()->all(),
