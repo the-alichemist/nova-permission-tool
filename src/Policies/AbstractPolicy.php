@@ -15,37 +15,34 @@ class AbstractPolicy
 
     public function resourceClass()
     {
-        // return Nova::resourceForKey(request()->route('resource'));
         return $this->resource;
     }
     
-    public function check($permission, $recordOwnership = false)
+    public function check($permission, $record = null)
     {
         $resource = $this->resourceClass();
         $permission = sprintf('%s-%s', $permission, $resource);
 
-        if (!$recordOwnership) {
-            if (Gate::check($permission)) {
+        if (!$record) {
+            return Gate::check($permission);
+        }
+        
+        $userIdCol = config('permission.column_names.user_id');
+        $hasUserAttribute = array_key_exists($userIdCol, $record->getAttributes());
+
+        if (Gate::check($permission)) {
+            if (!$hashasUserAttributeUser) {
                 return true;
             }
-        } else {
-            $record = $resource::$model::findOrFail(request()->route('resourceId'));
-            $userIdCol = config('permission.column_names.user_id');
-            $hasUser = array_key_exists($userIdCol, $record->getAttributes());
-
-            if (Gate::check($permission)) {
-                if (!$hasUser) {
-                    return true;
-                } else if ($record->$userIdCol == request()->user()->id) {
-                    return true;
-                }
+            if ($record->$userIdCol == request()->user()->id) {
+                return true;
             }
         }
 
         return false;
     }
 
-    public function viewAny(): bool
+    public function viewAny($user): bool
     {
         if ($this->check('view') || $this->check('viewAny')) {
             return true;
@@ -54,9 +51,9 @@ class AbstractPolicy
         return false;
     }
 
-    public function view(): bool
+    public function view($user, $record): bool
     {
-        if ($this->check('viewAny') || $this->check('view', true)) {
+        if ($this->check('viewAny') || $this->check('view', $record)) {
             return true;
         }
 
@@ -72,18 +69,20 @@ class AbstractPolicy
         return false;
     }
 
-    public function update(): bool
+    public function update($user, $record): bool
     {
-        if ($this->check('updateAny') || $this->check('update', true)) {
+        \Log::info('update called');
+        if ($this->check('updateAny') || $this->check('update', $record)) {
             return true;
         }
 
         return false;
     }
 
-    public function delete(): bool
+    public function delete($user, $record): bool
     {
-        if ($this->check('deleteAny') || $this->check('delete', true)) {
+        \Log::info('delete called');
+        if ($this->check('deleteAny') || $this->check('delete', $record)) {
             return true;
         }
 
