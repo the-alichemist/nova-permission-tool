@@ -71,7 +71,6 @@ class AbstractPolicy
 
     public function update($user, $record): bool
     {
-        \Log::info('update called');
         if ($this->check('updateAny') || $this->check('update', $record)) {
             return true;
         }
@@ -81,12 +80,11 @@ class AbstractPolicy
 
     public function delete($user, $record): bool
     {
-        \Log::info('delete called');
         if ($this->check('deleteAny') || $this->check('delete', $record)) {
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public function restore(): bool
@@ -95,7 +93,7 @@ class AbstractPolicy
             return true;
         }
 
-        return true;
+        return false;
     }
 
     public function forceDelete(): bool
@@ -104,6 +102,6 @@ class AbstractPolicy
             return true;
         }
 
-        return true;
+        return false;
     }
 }
