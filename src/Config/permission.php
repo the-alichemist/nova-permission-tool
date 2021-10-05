@@ -1,5 +1,7 @@
 <?php
 
+use DigitalCloud\PermissionTool\Policies\AbstractPolicy;
+
 return [
 
     'models' => [
@@ -25,7 +27,6 @@ return [
          */
 
         'role' => \DigitalCloud\PermissionTool\Models\Role::class,
-
     ],
 
     'table_names' => [
@@ -127,4 +128,7 @@ return [
 
         ]
     ],
+
+
+    'policy' => AbstractPolicy::class
 ];
