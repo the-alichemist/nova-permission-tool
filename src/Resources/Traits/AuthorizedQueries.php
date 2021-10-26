@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Contracts\Role;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\PermissionRegistrar;
-use Laravel\Nova\Contracts\RelatableField;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Spatie\Permission\Traits\HasPermissions;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -23,13 +22,8 @@ trait AuthorizedQueries
      */
     public static function indexQuery(NovaRequest $request, $query)
     {
-        $fieldClass = $request->newResource()
-                    ->availableFields($request)
-                    ->whereInstanceOf(RelatableField::class)
-                    ->findFieldByAttribute($request->field, function () {
-                        abort(404);
-                    })->resourceClass;
-        $permission = sprintf('viewAny-%s', $fieldClass);
+        $resource = $request->resource();
+        $permission = sprintf('viewAny-%s', $resource);
 
         if (Gate::check($permission)) {
             return $query;
