@@ -22,7 +22,15 @@ trait AuthorizedQueries
      */
     public static function indexQuery(NovaRequest $request, $query)
     {
-        $resource = $request->resource();
+        if (!$request->isResourceIndexRequest()) {
+            return;
+        }
+        
+        // if ($query->getModel()->getTable() != (new $resource::$model)->getTable()) {
+        //     return;
+        // }
+            
+        $resource = $request->resource();;
         $permission = sprintf('viewAny-%s', $resource);
 
         if (Gate::check($permission)) {

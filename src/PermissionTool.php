@@ -4,10 +4,11 @@ namespace DigitalCloud\PermissionTool;
 
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
-use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\Facades\Gate;
+use Laravel\Nova\Events\ServingNova;
 use DigitalCloud\PermissionTool\Resources\Role;
 use DigitalCloud\PermissionTool\Resources\Permission;
+use DigitalCloud\PermissionTool\Policies\AbstractPolicy;
 
 class PermissionTool extends Tool
 {
@@ -58,7 +59,7 @@ class PermissionTool extends Tool
 
     public function registerPolicies()
     {
-        $abstractPolicy = config('permission.policy');
+        $abstractPolicy = AbstractPolicy::class;;
         $resources = Nova::$resources;
         $resources[] = 'DigitalCloud\PermissionTool\Resources\Role';
         $resources[] = 'DigitalCloud\PermissionTool\Resources\Permission';
