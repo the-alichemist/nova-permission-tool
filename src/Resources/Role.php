@@ -91,7 +91,13 @@ class Role extends Resource
             BelongsToMany::make(__('PermissionTool::resources.Permissions'), 'permissions', Permission::class),
             MorphToMany::make($userResource::label(), 'users', $userResource),
 
-
+            DuplicateField::make('Duplicate')
+                ->withMeta([
+                    'resource' => 'role', // resource url
+                    'model' => 'App\Models\Role', // model path
+                    'id' => $this->id, // id of record
+                    'relations' => ['permissions'], // an array of any relations to load (nullable).
+                ]),
         ];
 
         return $fields;
