@@ -125,8 +125,10 @@ class Role extends Resource
             foreach ($object->actions(request()) as $action) {
                 if ($action->name) {
                     $name = $action->name . "-$resource";
-                    $this->rolePermissions[] = $name;
+                } else {
+                    $name = get_class($action) . "-$resource";
                 }
+                $this->rolePermissions[] = $name;
             }
         }
     }
