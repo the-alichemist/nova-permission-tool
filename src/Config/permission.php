@@ -110,6 +110,7 @@ return [
      */
 
     'permissions' => [
+        'admin_emails' => ['example@example.com'],
         'resource' => [
             'create',
             'view',
@@ -123,9 +124,12 @@ return [
             'attach',
             'detach',
         ],
-        'admin_emails' => ['example@example.com'],
-        'exclude_resources' => [
-
+        'exclude_resources' => [],
+        'custom_permissions' => [
+            // 'App\Nova\User' => [
+            //     'salary_field'
+            // ],
+            // 'reports'
         ]
     ],
 

@@ -13,7 +13,7 @@
                                     :name="group.name"
                                     :checked="isAllGroupedOptionsSelected(group.options)"
                                 >&nbsp;</checkbox>
-                                <h4>{{group.name}}</h4>
+                                <h4> {{group.name}}</h4>
                             </div>
 
                         </legend>
@@ -35,7 +35,7 @@
                         <div v-if="group.actions.length > 0">
                             <h4>Actions</h4>
                             <hr class="border-t">
-                        
+
                             <div v-for="option in group.actions" :key="option.value" @click="handleChange(option.value)" class="flex mb-1">
                                 <div>
                                     <checkbox

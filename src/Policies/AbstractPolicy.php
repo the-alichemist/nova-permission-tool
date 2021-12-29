@@ -17,7 +17,7 @@ class AbstractPolicy
     {
         return $this->resource;
     }
-    
+
     public function check($permission, $record = null)
     {
         $resource = $this->resourceClass();
@@ -26,7 +26,7 @@ class AbstractPolicy
         if (!$record) {
             return Gate::check($permission);
         }
-        
+
         $userIdCol = config('permission.column_names.user_id');
         $hasUserAttribute = array_key_exists($userIdCol, $record->getAttributes());
 

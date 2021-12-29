@@ -78,8 +78,8 @@ class Role extends Resource
 
             Text::make(__('PermissionTool::roles.name'), 'name')
                 ->rules(['required', 'string', 'max:255'])
-                ->creationRules('unique:'.config('permission.table_names.roles'))
-                ->updateRules('unique:'.config('permission.table_names.roles').',name,{{resourceId}}'),
+                ->creationRules('unique:' . config('permission.table_names.roles'))
+                ->updateRules('unique:' . config('permission.table_names.roles') . ',name,{{resourceId}}'),
 
             \DigitalCloud\PermissionTool\Fields\Permission::make(__('PermissionTool::resources.Permissions'), 'permissions')->onlyOnForms(),
 
@@ -101,6 +101,7 @@ class Role extends Resource
     {
         $this->setupResourcePermissions();
         $this->setupToolPermissions();
+        $this->setupCustomPermissions();
         $this->syncPermissions();
     }
 
@@ -108,7 +109,7 @@ class Role extends Resource
     {
         $resourcePermissions = config('permission.permissions.resource');
         foreach (Nova::$resources as $resource) {
-            if($resource == 'Laravel\Nova\Actions\ActionResource') {
+            if ($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
             }
             // $resourceName = strtolower(substr(strrchr($resource, "\\"), 1));
@@ -122,13 +123,12 @@ class Role extends Resource
             // add resource actions
             $object = new $resource($resource::$model);
             foreach ($object->actions(request()) as $action) {
-                if($action->name) {
+                if ($action->name) {
                     $name = $action->name . "-$resource";
                     $this->rolePermissions[] = $name;
                 }
             }
         }
-        
     }
 
     protected function setupToolPermissions()
@@ -146,11 +146,27 @@ class Role extends Resource
     }
 
 
+    protected function setupCustomPermissions()
+    {
+        $permissions = config('permission.permissions.custom_permissions', []);
+
+        foreach ($permissions as $key => $permission) {
+            if (is_array($permission)) {
+                foreach ($permission as $p) {
+                    $this->rolePermissions[] = sprintf('%s-%s', $p, $key);
+                }
+            } else {
+                $this->rolePermissions[] = sprintf('%s-CustomPermission', $permission);
+            }
+        }
+    }
+
     protected function syncPermissions()
     {
-        foreach ($this->rolePermissions as $resourcePermission) {
+        foreach (collect($this->rolePermissions)->unique()->toArray() as $resourcePermission) {
             \DigitalCloud\PermissionTool\Models\Permission::firstOrCreate(
-                ['name' => $resourcePermission], ['guard_name' => 'web']
+                ['name' => $resourcePermission],
+                ['guard_name' => 'web']
             );
         }
         \DigitalCloud\PermissionTool\Models\Permission::whereNotIn('name', $this->rolePermissions)->delete();
@@ -201,13 +217,13 @@ class Role extends Resource
     }
 
 
-//    public function authorizedToDelete(Request $request)
-//    {
-//        return false;
-//    }
-//
-//    public function authorizedToUpdate(Request $request)
-//    {
-//        return ($this->id == 1)? false : true;
-//    }
+    //    public function authorizedToDelete(Request $request)
+    //    {
+    //        return false;
+    //    }
+    //
+    //    public function authorizedToUpdate(Request $request)
+    //    {
+    //        return ($this->id == 1)? false : true;
+    //    }
 }

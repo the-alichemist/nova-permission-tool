@@ -43,16 +43,21 @@ class Permission extends Field
         $this->options();
     }
 
-    public function options() {
+    public function options()
+    {
         return $this->withMeta([
             'options' => \DigitalCloud\PermissionTool\Models\Permission::get()->map(function ($permission) {
                 $permissionDisplay = substr($permission->name, 0, strrpos($permission->name, '-'));
                 $resourceClass = substr($permission->name, strrpos($permission->name, '-') + 1);
-                $action = !in_array($permissionDisplay, config('permission.permissions.resource'));
-                
+                $action = !in_array($permissionDisplay, config('permission.permissions.resource'))
+                    && !in_array($permissionDisplay, collect(config('permission.permissions.custom_permissions'))->flatten()->toArray());
+
                 if ($resourceClass == 'Laravel\Nova\Tool') {
                     $group = 'Tools';
                     $permissionDisplay = substr($permissionDisplay, strrpos($permissionDisplay, '\\') + 1);
+                    $action = false;
+                } else if ($resourceClass == 'CustomPermission') {
+                    $group = 'Custom Permission';
                     $action = false;
                 } else {
                     $group = $resourceClass::label();
@@ -66,44 +71,42 @@ class Permission extends Field
                 ];
             })->values()->all(),
         ]);
-
     }
 
-    public function checked($checked = []) {
+    public function checked($checked = [])
+    {
         return $this->withMeta(['checked' => $checked]);
     }
 
     private function shouldSaveAsString()
     {
-        return (
-            array_key_exists('save_as_string', $this->meta)
+        return (array_key_exists('save_as_string', $this->meta)
             && $this->meta['save_as_string']
         );
     }
 
     private function shouldSaveUnchecked()
     {
-        return (
-            array_key_exists('save_unchecked', $this->meta)
+        return (array_key_exists('save_unchecked', $this->meta)
             && $this->meta['save_unchecked']
         );
     }
 
     protected function fillAttributeFromRequest(
-        NovaRequest $request, $requestAttribute, $model, $attribute
-    )
-    {
+        NovaRequest $request,
+        $requestAttribute,
+        $model,
+        $attribute
+    ) {
         if ($request->exists($requestAttribute)) {
 
             $data = json_decode($request[$requestAttribute]);
 
-            if($this->shouldSaveAsString()){
+            if ($this->shouldSaveAsString()) {
                 $value = implode(',', $this->onlyChecked($data));
-            }
-            elseif($this->shouldSaveUnchecked()){
+            } elseif ($this->shouldSaveUnchecked()) {
                 $value = $data;
-            }
-            else {
+            } else {
                 $value = $this->onlyChecked($data);
             }
 
@@ -115,10 +118,10 @@ class Permission extends Field
     {
         $value = data_get($resource, $attribute);
 
-        if(! $value) return json_encode($this->withUnchecked([]));
+        if (!$value) return json_encode($this->withUnchecked([]));
 
-        if(is_array($value)){
-            if($this->arrayIsAssoc($value)){
+        if (is_array($value)) {
+            if ($this->arrayIsAssoc($value)) {
                 $all = $this->withUnchecked([]);
                 $mer = array_merge($all, $value);
                 return json_encode($mer);
@@ -132,10 +135,12 @@ class Permission extends Field
     private function withUnchecked($data)
     {
         return collect($this->meta['options'])
-            ->mapWithKeys(function($option) use ($data){
-                $value = array_filter($data, function($item) use ($option) { return $option['value'] == $item['id'];});
-                $isChecked = $value? true : false;
-                return [ $option['value'] => $isChecked ];
+            ->mapWithKeys(function ($option) use ($data) {
+                $value = array_filter($data, function ($item) use ($option) {
+                    return $option['value'] == $item['id'];
+                });
+                $isChecked = $value ? true : false;
+                return [$option['value'] => $isChecked];
             })
             ->all();
     }
@@ -144,10 +149,10 @@ class Permission extends Field
     {
 
         return collect($data)
-            ->filter(function($isChecked){
+            ->filter(function ($isChecked) {
                 return $isChecked;
             })
-            ->map(function($value, $key){
+            ->map(function ($value, $key) {
                 return $key;
             })
             ->values()
@@ -160,5 +165,4 @@ class Permission extends Field
 
         return array_keys($array) !== range(0, count($array) - 1);
     }
-
 }

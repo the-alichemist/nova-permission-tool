@@ -2,7 +2,9 @@
 
 # Nova Permission Tool.
 
-This tool allows you to create and manage rules and permissions for nova resources, actions & tools. After installation, the default nova resource permissions will be generated for all available resources and resource actions as well as global Nova Tools
+This tool allows you to create and manage rules and permissions for nova resources, actions & tools. After installation, the default nova resource permissions will be generated for all available resources and resource actions as well as global Nova Tools.
+
+In addition we can also define `custom_permissions` in configuration `permission`, which can be either linked with a resource or be created as global `Custom Permission`.
 
 # Requirements & Dependencies
 
