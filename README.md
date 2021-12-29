@@ -113,3 +113,7 @@ class Quotation extends Resource {
 ## Images
 
 ![per](https://user-images.githubusercontent.com/41853913/50079673-e1971880-01f2-11e9-9e45-d9c0c7e1b861.PNG)
+
+## Todo
+
+[] Do not show action permission. (Depreciated: Action without name does not show)
