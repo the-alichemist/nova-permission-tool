@@ -25,18 +25,23 @@ trait AuthorizedQueries
         if (!$request->isResourceIndexRequest()) {
             return;
         }
-        
+
         // if ($query->getModel()->getTable() != (new $resource::$model)->getTable()) {
         //     return;
         // }
-            
+
         $resource = $request->resource();;
         $permission = sprintf('viewAny-%s', $resource);
 
         if (Gate::check($permission)) {
             return $query;
         }
+
+        // User Model should search with id, not user_id
+        if (get_class($query->getModel()) == config('permission.models.user')) {
+            return $query->where('id', request()->user()->id);
+        }
+
         return $query->where(config('permission.column_names.user_id'), request()->user()->id);
     }
 }
-
