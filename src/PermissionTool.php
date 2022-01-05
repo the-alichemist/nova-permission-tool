@@ -27,8 +27,8 @@ class PermissionTool extends Tool
             $this->permissionResource,
         ]);
 
-        Nova::script('PermissionTool', __DIR__.'/../dist/js/tool.js');
-        Nova::style('PermissionTool', __DIR__.'/../dist/css/tool.css');
+        Nova::script('PermissionTool', __DIR__ . '/../dist/js/tool.js');
+        Nova::style('PermissionTool', __DIR__ . '/../dist/css/tool.css');
 
         $this->registerPolicies();
     }
@@ -61,11 +61,9 @@ class PermissionTool extends Tool
     {
         $abstractPolicy = AbstractPolicy::class;;
         $resources = Nova::$resources;
-        $resources[] = 'DigitalCloud\PermissionTool\Resources\Role';
-        $resources[] = 'DigitalCloud\PermissionTool\Resources\Permission';
-        
+
         foreach ($resources as $resource) {
-            if($resource == 'Laravel\Nova\Actions\ActionResource') {
+            if ($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
             }
             $anonymousPolicy = eval("return (new class extends $abstractPolicy {
@@ -79,7 +77,8 @@ class PermissionTool extends Tool
      * @param String $tool
      * @return String
      */
-    public static function getToolPermission($tool) {
+    public static function getToolPermission($tool)
+    {
         return sprintf('%s-Laravel\Nova\Tool', get_class($tool));
     }
 
@@ -88,8 +87,10 @@ class PermissionTool extends Tool
         Nova::serving(function (ServingNova $event) {
             $tools = collect(Nova::$tools)->filter(function ($tool) {
                 return $tool->renderNavigation() && !in_array(get_class($tool), [
+                    // Laravel Nova Offical Resources
                     'Laravel\Nova\Tools\Dashboard',
                     'Laravel\Nova\Tools\ResourceManager',
+                    // -----END----
                     "DigitalCloud\PermissionTool\PermissionTool"
                 ]);
             });
