@@ -27,6 +27,11 @@ return [
          */
 
         'role' => \DigitalCloud\PermissionTool\Models\Role::class,
+
+        /**
+         * User Model
+         */
+        'user' => \App\Models\User::class,
     ],
 
     'table_names' => [
@@ -110,7 +115,9 @@ return [
      */
 
     'permissions' => [
-        'admin_emails' => ['example@example.com'],
+        'admin_emails' => [
+            'example@example.com'
+        ],
         'resource' => [
             'create',
             'view',
@@ -130,6 +137,9 @@ return [
             //     'salary_field'
             // ],
             // 'reports'
+        ],
+        'resources_with_assign_users' => [
+            // App\Nova\Task
         ]
     ],
 

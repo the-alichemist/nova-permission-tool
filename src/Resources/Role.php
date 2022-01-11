@@ -112,6 +112,10 @@ class Role extends Resource
             if ($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
             }
+
+            if (in_array($resource, config('permission.permissions.exclude_resources'))) {
+                continue;
+            }
             // $resourceName = strtolower(substr(strrchr($resource, "\\"), 1));
             // $resourceName = $resource;
 

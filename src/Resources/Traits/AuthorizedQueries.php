@@ -23,23 +23,34 @@ trait AuthorizedQueries
     public static function indexQuery(NovaRequest $request, $query)
     {
         if (!$request->isResourceIndexRequest()) {
-            return;
+            return $query;
         }
 
-        // if ($query->getModel()->getTable() != (new $resource::$model)->getTable()) {
-        //     return;
-        // }
+        // Do not apply on excluded resources
+        $resource = $request->resource();
+        if (in_array($resource, config('permission.permissions.exclude_resources', []))) {
+            return $query;
+        }
 
-        $resource = $request->resource();;
+        // Allow view on all records
         $permission = sprintf('viewAny-%s', $resource);
-
         if (Gate::check($permission)) {
             return $query;
         }
 
-        // User Model should search with id, not user_id
+        // Is User Model.
+        // Requires check against id field
         if (get_class($query->getModel()) == config('permission.models.user')) {
             return $query->where('id', request()->user()->id);
+        }
+
+        // Record belongsTo or is AssignedTo User
+        if (in_array($resource, config('permission.permissions.resources_with_assign_users', []))) {
+            return $query->where(function ($q) {
+                $q->whereHas('users', function ($q) {
+                    $q->where('users.id', request()->user()->id);
+                })->orWhere(config('permission.column_names.user_id'), request()->user()->id);
+            });
         }
 
         return $query->where(config('permission.column_names.user_id'), request()->user()->id);

@@ -34,8 +34,13 @@ class AbstractPolicy
             if (!$hasUserAttribute) {
                 return true;
             }
+
             if ($record->$userIdCol == request()->user()->id) {
                 return true;
+            }
+
+            if (in_array($resource, config('permission.permissions.resources_with_assign_users', []))) {
+                return $record->users->firstWhere('id', request()->user()->id);
             }
         }
 
