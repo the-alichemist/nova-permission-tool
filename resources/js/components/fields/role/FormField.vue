@@ -1,8 +1,8 @@
 <template>
     <default-field :field="field">
-        <template slot="field">
+        <template v-slot:field>
             <div class="flex flex-wrap content-start -mx-1 mb-1" >
-                <div v-for="option in field.options" @click="handleChange(option.value)" class="flex items-center w-1/3">
+                <div v-for="option in field.options" :key="option" @click="handleChange(option.value)" class="flex items-center w-1/3">
                     <checkbox
                     class="py-2 mr-4"
                     :id="field.name"
