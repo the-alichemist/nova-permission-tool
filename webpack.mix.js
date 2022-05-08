@@ -15,3 +15,4 @@ mix.alias({
     "vendor/laravel/nova/resources/js/mixins/packages.js"
   ),
 });
+

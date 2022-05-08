@@ -3,8 +3,7 @@
 namespace DigitalCloud\PermissionTool\Resources;
 
 use Laravel\Nova\Nova;
-use Laravel\Nova\Http\Requests\NovaRequest;
-use App\Nova\Resource;
+use Laravel\Nova\Resource;
 use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
@@ -14,6 +13,7 @@ use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Fields\BelongsToMany;
 use Spatie\Permission\PermissionRegistrar;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Permission extends Resource
 {
@@ -60,10 +60,10 @@ class Permission extends Resource
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function fields(Request $request)
+    public function fields(NovaRequest $request)
     {
         $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
 
@@ -92,10 +92,10 @@ class Permission extends Resource
     /**
      * Get the cards available for the request.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function cards(Request $request)
+    public function cards(NovaRequest $request)
     {
         return [];
     }
@@ -103,10 +103,10 @@ class Permission extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function filters(Request $request)
+    public function filters(NovaRequest $request)
     {
         return [];
     }
@@ -114,10 +114,10 @@ class Permission extends Resource
     /**
      * Get the lenses available for the resource.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function lenses(Request $request)
+    public function lenses(NovaRequest $request)
     {
         return [];
     }
@@ -125,10 +125,10 @@ class Permission extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function actions(Request $request)
+    public function actions(NovaRequest $request)
     {
         return [];
     }
