@@ -2,15 +2,16 @@
 
 namespace DigitalCloud\PermissionTool;
 
-use Illuminate\Http\Request;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
+use Illuminate\Http\Request;
+use Laravel\Nova\Menu\MenuItem;
+use Laravel\Nova\Menu\MenuSection;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Events\ServingNova;
 use DigitalCloud\PermissionTool\Resources\Role;
 use DigitalCloud\PermissionTool\Resources\Permission;
 use DigitalCloud\PermissionTool\Policies\AbstractPolicy;
-use Laravel\Nova\Menu\MenuSection;
 
 class PermissionTool extends Tool
 {
@@ -42,8 +43,11 @@ class PermissionTool extends Tool
      */
     public function menu(Request $request)
     {
-        return MenuSection::make('Permissions')
-            ->path('/permission-tool')
+        return MenuSection::make('Permission Tool', [
+            MenuItem::resource(Role::class),
+            MenuItem::resource(Permission::class),
+        ])->path('#')
+            
             ->icon('server');
     }
         

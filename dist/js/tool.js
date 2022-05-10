@@ -411,42 +411,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
 
 var _hoisted_1 = {
-  slot: "field",
-  "class": "w-4/5"
-};
-var _hoisted_2 = {
   "class": "flex flex-wrap content-start"
 };
-var _hoisted_3 = {
+var _hoisted_2 = {
   "class": "w-full p-2 m-1 h-full"
 };
-var _hoisted_4 = {
+var _hoisted_3 = {
   "class": "mx-1 px-1"
 };
-var _hoisted_5 = {
+var _hoisted_4 = {
   "class": "flex"
 };
 
-var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" ");
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" ");
 
-var _hoisted_7 = ["onClick"];
-var _hoisted_8 = ["for", "textContent"];
-var _hoisted_9 = {
+var _hoisted_6 = ["onClick"];
+var _hoisted_7 = ["for", "textContent"];
+var _hoisted_8 = {
   key: 0
 };
 
-var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Actions", -1
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, "Actions", -1
 /* HOISTED */
 );
 
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("hr", {
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("hr", {
   "class": "border-t"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_12 = ["onClick"];
-var _hoisted_13 = ["for", "textContent"];
+var _hoisted_11 = ["onClick"];
+var _hoisted_12 = ["for", "textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_checkbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("checkbox");
 
@@ -456,12 +452,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     field: $props.field,
     "class": "w-4/5"
   }, {
-    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("template", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.availableGroups, function (group) {
+    field: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.availableGroups, function (group) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: group.name,
           "class": "flex items-center w-1/3 mb-2"
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("legend", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("legend", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
           "class": "",
           onInput: function onInput($event) {
             return $options.selectAllGroupedOptions(group.options);
@@ -471,7 +467,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           checked: $options.isAllGroupedOptionsSelected(group.options)
         }, {
           "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-            return [_hoisted_6];
+            return [_hoisted_5];
           }),
           _: 2
           /* DYNAMIC */
@@ -499,12 +495,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.display)
           }, null, 8
           /* PROPS */
-          , _hoisted_8)])], 8
+          , _hoisted_7)])], 8
           /* PROPS */
-          , _hoisted_7);
+          , _hoisted_6);
         }), 128
         /* KEYED_FRAGMENT */
-        )), group.actions.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [_hoisted_10, _hoisted_11, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(group.actions, function (option) {
+        )), group.actions.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, _hoisted_10, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(group.actions, function (option) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
             key: option.value,
             onClick: function onClick($event) {
@@ -523,15 +519,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.display)
           }, null, 8
           /* PROPS */
-          , _hoisted_13)])], 8
+          , _hoisted_12)])], 8
           /* PROPS */
-          , _hoisted_12);
+          , _hoisted_11);
         }), 128
         /* KEYED_FRAGMENT */
         ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]);
       }), 128
       /* KEYED_FRAGMENT */
-      ))])])];
+      ))])];
     }),
     _: 1
     /* STABLE */
@@ -710,12 +706,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 /***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
 
 Nova.booting(function (Vue) {
-  Vue.component("index-role", (__webpack_require__(/*! ./components/fields/role/IndexField */ "./resources/js/components/fields/role/IndexField.vue")["default"]));
-  Vue.component("detail-role", (__webpack_require__(/*! ./components/fields/role/DetailField */ "./resources/js/components/fields/role/DetailField.vue")["default"]));
-  Vue.component("form-role", (__webpack_require__(/*! ./components/fields/role/FormField */ "./resources/js/components/fields/role/FormField.vue")["default"]));
-  Vue.component("index-permission", (__webpack_require__(/*! ./components/fields/permission/IndexField */ "./resources/js/components/fields/permission/IndexField.vue")["default"]));
-  Vue.component("detail-permission", (__webpack_require__(/*! ./components/fields/permission/DetailField */ "./resources/js/components/fields/permission/DetailField.vue")["default"]));
-  Vue.component("form-permission", (__webpack_require__(/*! ./components/fields/permission/FormField */ "./resources/js/components/fields/permission/FormField.vue")["default"]));
+  Vue.component("index-role-field", (__webpack_require__(/*! ./components/fields/role/IndexField */ "./resources/js/components/fields/role/IndexField.vue")["default"]));
+  Vue.component("detail-role-field", (__webpack_require__(/*! ./components/fields/role/DetailField */ "./resources/js/components/fields/role/DetailField.vue")["default"]));
+  Vue.component("form-role-field", (__webpack_require__(/*! ./components/fields/role/FormField */ "./resources/js/components/fields/role/FormField.vue")["default"]));
+  Vue.component("index-permission-field", (__webpack_require__(/*! ./components/fields/permission/IndexField */ "./resources/js/components/fields/permission/IndexField.vue")["default"]));
+  Vue.component("detail-permission-field", (__webpack_require__(/*! ./components/fields/permission/DetailField */ "./resources/js/components/fields/permission/DetailField.vue")["default"]));
+  Vue.component("form-permission-field", (__webpack_require__(/*! ./components/fields/permission/FormField */ "./resources/js/components/fields/permission/FormField.vue")["default"]));
   Nova.inertia("PermissionTool", (__webpack_require__(/*! ./components/Tool */ "./resources/js/components/Tool.vue")["default"]));
 });
 

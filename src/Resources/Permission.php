@@ -40,7 +40,7 @@ class Permission extends Resource
         'name',
     ];
 
-    public static $displayInNavigation = false;
+    public static $displayInNavigation = true;
 
     public static function getModel()
     {

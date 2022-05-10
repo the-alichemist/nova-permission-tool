@@ -14,7 +14,7 @@ class Permission extends Field
      *
      * @var string
      */
-    public $component = 'permission';
+    public $component = 'permission-field';
 
     /**
      * The URI key of the related resource.
