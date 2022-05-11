@@ -1,6 +1,6 @@
 <template>
     <default-field :field="field" class="w-4/5">
-        <template slot="field" class="w-4/5">
+        <template v-slot:field class="w-4/5">
             <div class="flex flex-wrap content-start " >
                 <div v-for="group in availableGroups" :key="group.name" class="flex items-center w-1/3 mb-2">
                     <fieldset class="w-full p-2 m-1 h-full">

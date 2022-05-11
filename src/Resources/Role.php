@@ -2,8 +2,8 @@
 
 namespace DigitalCloud\PermissionTool\Resources;
 
-use App\Nova\Resource;
 use Laravel\Nova\Nova;
+use Laravel\Nova\Resource;
 use Laravel\Nova\Fields\ID;
 use App\Rules\HasPermission;
 use Illuminate\Http\Request;
@@ -16,6 +16,7 @@ use Laravel\Nova\Fields\BelongsToMany;
 use Fourstacks\NovaCheckboxes\Checkboxes;
 use Spatie\Permission\PermissionRegistrar;
 use DigitalCloud\CheckboxList\CheckboxList;
+use Laravel\Nova\Http\Requests\NovaRequest;
 use DigitalCloud\PermissionTool\PermissionTool;
 
 class Role extends Resource
@@ -45,7 +46,7 @@ class Role extends Resource
         'name',
     ];
 
-    public static $displayInNavigation = false;
+    public static $displayInNavigation = true;
 
     public static function getModel()
     {
@@ -65,12 +66,12 @@ class Role extends Resource
     /**
      * Get the fields displayed by the resource.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function fields(Request $request)
+    public function fields(NovaRequest $request)
     {
-        $this->setupPermission();
+        $this->setupPermission($request);
         $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
 
         $fields =  [
@@ -84,12 +85,12 @@ class Role extends Resource
             \DigitalCloud\PermissionTool\Fields\Permission::make(__('PermissionTool::resources.Permissions'), 'permissions')->onlyOnForms(),
 
             Text::make('permissions count')->withMeta(['value' => count($this->permissions)])->exceptOnForms(),
-            Text::make('users count')->withMeta(['value' => count($this->users)])->exceptOnForms(),
-            DateTime::make(__('PermissionTool::roles.created_at'), 'created_at')->exceptOnForms(),
-            DateTime::make(__('PermissionTool::roles.updated_at'), 'updated_at')->exceptOnForms(),
+            // Text::make('users count')->withMeta(['value' => count($this->users)])->exceptOnForms(),
+            // DateTime::make(__('PermissionTool::roles.created_at'), 'created_at')->exceptOnForms(),
+            // DateTime::make(__('PermissionTool::roles.updated_at'), 'updated_at')->exceptOnForms(),
 
-            BelongsToMany::make(__('PermissionTool::resources.Permissions'), 'permissions', Permission::class),
-            MorphToMany::make($userResource::label(), 'users', $userResource),
+            // BelongsToMany::make(__('PermissionTool::resources.Permissions'), 'permissions', Permission::class),
+            // MorphToMany::make($userResource::label(), 'users', $userResource),
 
 
         ];
@@ -97,15 +98,15 @@ class Role extends Resource
         return $fields;
     }
 
-    public function setupPermission()
+    public function setupPermission(NovaRequest $request)
     {
-        $this->setupResourcePermissions();
+        $this->setupResourcePermissions($request);
         $this->setupToolPermissions();
         $this->setupCustomPermissions();
         $this->syncPermissions();
     }
 
-    protected function setupResourcePermissions()
+    protected function setupResourcePermissions(NovaRequest $request)
     {
         $resourcePermissions = config('permission.permissions.resource');
         foreach (Nova::$resources as $resource) {
@@ -126,7 +127,7 @@ class Role extends Resource
 
             // add resource actions
             $object = new $resource($resource::$model);
-            foreach ($object->actions(request()) as $action) {
+            foreach ($object->actions($request) as $action) {
                 if ($action->name) {
                     $name = $action->name . "-$resource";
                 } else {
@@ -140,7 +141,7 @@ class Role extends Resource
     protected function setupToolPermissions()
     {
         $tools = collect(Nova::$tools)->filter(function ($tool) {
-            return $tool->renderNavigation() && !in_array(get_class($tool), [
+            return $tool->menu(request()) && !in_array(get_class($tool), [
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
                 "DigitalCloud\PermissionTool\PermissionTool"
@@ -181,10 +182,10 @@ class Role extends Resource
     /**
      * Get the cards available for the request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function cards(Request $request)
+    public function cards(NovaRequest $request)
     {
         return [];
     }
@@ -192,10 +193,10 @@ class Role extends Resource
     /**
      * Get the filters available for the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function filters(Request $request)
+    public function filters(NovaRequest $request)
     {
         return [];
     }
@@ -203,10 +204,10 @@ class Role extends Resource
     /**
      * Get the lenses available for the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Laravel\Nova\Http\NovaRequest\NovaRequest  $request
      * @return array
      */
-    public function lenses(Request $request)
+    public function lenses(NovaRequest $request)
     {
         return [];
     }
@@ -214,10 +215,9 @@ class Role extends Resource
     /**
      * Get the actions available for the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    public function actions(Request $request)
+    public function actions(NovaRequest $request)
     {
         return [];
     }

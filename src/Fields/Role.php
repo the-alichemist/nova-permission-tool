@@ -12,7 +12,7 @@ class Role extends Field
      *
      * @var string
      */
-    public $component = 'role';
+    public $component = 'role-field';
 
     /**
      * The URI key of the related resource.

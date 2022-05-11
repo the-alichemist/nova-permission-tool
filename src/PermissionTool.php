@@ -4,6 +4,9 @@ namespace DigitalCloud\PermissionTool;
 
 use Laravel\Nova\Nova;
 use Laravel\Nova\Tool;
+use Illuminate\Http\Request;
+use Laravel\Nova\Menu\MenuItem;
+use Laravel\Nova\Menu\MenuSection;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Events\ServingNova;
 use DigitalCloud\PermissionTool\Resources\Role;
@@ -38,11 +41,17 @@ class PermissionTool extends Tool
      *
      * @return \Illuminate\View\View
      */
-    public function renderNavigation()
+    public function menu(Request $request)
     {
-        return view('PermissionTool::navigation');
+        return MenuSection::make('Permission Tool', [
+            MenuItem::resource(Role::class),
+            MenuItem::resource(Permission::class),
+        ])->path('#')
+            
+            ->icon('server');
     }
-
+        
+    
     public function roleResource(string $roleResource)
     {
         $this->roleResource = $roleResource;
@@ -86,7 +95,7 @@ class PermissionTool extends Tool
     {
         Nova::serving(function (ServingNova $event) {
             $tools = collect(Nova::$tools)->filter(function ($tool) {
-                return $tool->renderNavigation() && !in_array(get_class($tool), [
+                return $tool->menu(request()) && !in_array(get_class($tool), [
                     // Laravel Nova Offical Resources
                     'Laravel\Nova\Tools\Dashboard',
                     'Laravel\Nova\Tools\ResourceManager',
