@@ -9,7 +9,6 @@
                                 <checkbox
                                     class=""
                                     @input="selectAllGroupedOptions(group.options)"
-                                    :id="group.name"
                                     :name="group.name"
                                     :checked="isAllGroupedOptionsSelected(group.options)"
                                 >&nbsp;</checkbox>
@@ -22,7 +21,6 @@
                             <div>
                                 <checkbox
                                 class="py-2 mr-4"
-                                :id="field.name"
                                 :name="field.name"
                                 :checked="options[option.value]"
                                 ></checkbox>
@@ -40,7 +38,6 @@
                                 <div>
                                     <checkbox
                                     class="py-2 mr-4"
-                                    :id="field.name"
                                     :name="field.name"
                                     :checked="options[option.value]"
                                     ></checkbox>
