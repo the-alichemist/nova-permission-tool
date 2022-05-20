@@ -46,7 +46,7 @@ class PermissionTool extends Tool
         return MenuSection::make('Permission Tool', [
             MenuItem::resource(Role::class),
             MenuItem::resource(Permission::class),
-        ])->path('#')
+        ])
             
             ->icon('server');
     }
