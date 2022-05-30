@@ -43,12 +43,12 @@ class PermissionTool extends Tool
      */
     public function menu(Request $request)
     {
-        return MenuSection::make('Permission Tool', [
-            MenuItem::resource(Role::class),
-            MenuItem::resource(Permission::class),
-        ])
+        // return MenuSection::make('Permission Tool', [
+        //     MenuItem::resource(Role::class),
+        //     MenuItem::resource(Permission::class),
+        // ])
             
-            ->icon('server');
+        //     ->icon('server');
     }
         
     
