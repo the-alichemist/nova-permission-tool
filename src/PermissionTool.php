@@ -85,34 +85,42 @@ class PermissionTool extends Tool
         }
     }
 
-    public static function registerFieldPermissions($resourceInstance, $fieldsList) {
+    public static function registerFieldPermissions($resourceInstance, $fieldsList)
+    {
         $fieldsWithPermissions = [];
         $resource = get_class($resourceInstance);
-        foreach($fieldsList as $field) {
+        foreach ($fieldsList as $field) {
             if (in_array(get_class($field), ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
-                $field->data = collect($field->data)->each(function($nestedField) use($resource) {
+                $field->data = collect($field->data)->each(function ($nestedField) use ($resource) {
                     return self::checkFieldPermission($nestedField, $resource);
                 })->toArray();
                 $fieldsWithPermissions[] = $field;
                 continue;
             }
-            
+
             $fieldsWithPermissions[] = self::checkFieldPermission($field, $resource);
         }
         return $fieldsWithPermissions;
     }
 
-    public static function checkFieldPermission($field, $resource) { 
+    public static function checkFieldPermission($field, $resource)
+    {
         if ($field->attribute) {
 
             $field->readonly(function () use ($field, $resource) {
+                if ($field->attribute === 'ComputedField') {
+                    return Gate::check($field->name . " (readonly)" . "-$resource");
+                }
                 return Gate::check($field->attribute . " (readonly)" . "-$resource");
             });
             $field->canSee(function () use ($field, $resource) {
-                $filteredRoles = Auth::user()->roles->filter(function($role) use ($field, $resource) {
+                $filteredRoles = Auth::user()->roles->filter(function ($role) use ($field, $resource) {
+                    if ($field->attribute === 'ComputedField') {
+                        return !$role->hasPermissionTo($field->name . " (hidden)" . "-$resource");
+                    }
                     return !$role->hasPermissionTo($field->attribute . " (hidden)" . "-$resource");
                 });
-    
+
                 return $filteredRoles->count();
                 // return Gate::denies($field->attribute . " (hidden)" . "-$resource");
             });
@@ -121,7 +129,8 @@ class PermissionTool extends Tool
     }
 
 
-    public static function registerToolPermissions() {
+    public static function registerToolPermissions()
+    {
         $tools = collect(Nova::$tools)->filter(function ($tool) {
             return $tool->menu(request()) && !in_array(get_class($tool), [
                 // Laravel Nova Offical Resources

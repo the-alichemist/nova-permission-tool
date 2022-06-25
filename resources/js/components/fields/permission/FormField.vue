@@ -132,16 +132,17 @@
               <div
                 v-for="option in tools"
                 :key="option.value"
-                class="flex mb-1 mr-10 my-3"
+                class="mb-1 mr-10 my-3 text-base"
               >
-                <div>
+                <div class="grid grid-cols-2 justify-items-center">
+                  <label class="ml-0 mr-auto" :for="field.name" v-text="option.display"></label>
                   <checkbox
                     @click="handleChange(option.value)"
                     class="py-2 mr-1"
                     :name="field.name"
                     :checked="options[option.value]"
                   ></checkbox>
-                  <label :for="field.name" v-text="option.display"></label>
+                  <!-- <label :for="field.name" v-text="option.display"></label> -->
                 </div>
               </div>
             </div>
