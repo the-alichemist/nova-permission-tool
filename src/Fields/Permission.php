@@ -49,7 +49,13 @@ class Permission extends Field
             'options' => \DigitalCloud\PermissionTool\Models\Permission::get()->map(function ($permission) {
                 $permissionDisplay = substr($permission->name, 0, strrpos($permission->name, '-'));
                 $action = !in_array($permissionDisplay, config('permission.permissions.resource'))
-                    && !in_array($permissionDisplay, collect(config('permission.permissions.custom_permissions'))->flatten()->toArray());
+                    && !in_array($permissionDisplay, collect(config('permission.permissions.custom_permissions'))->flatten()->toArray())
+                    && !str_contains($permissionDisplay, '(readonly)')
+                    && !str_contains($permissionDisplay, '(hidden)');
+
+                $field = str_contains($permissionDisplay, '(readonly)')
+                && str_contains($permissionDisplay, '(hidden)');
+                $fieldType = null;
 
                 if ($classIndex = strrpos($permissionDisplay, '\\')) {
                     $permissionDisplay = substr($permissionDisplay, $classIndex + 1);
@@ -63,9 +69,22 @@ class Permission extends Field
                 } else if ($resourceClass == 'CustomPermission') {
                     $group = 'Custom Permission';
                     $action = false;
+                } else if (str_contains($permissionDisplay, '(Readonly)') ) {
+                    $permissionDisplay = str_replace('(Readonly)','',$permissionDisplay);
+                    $group = $resourceClass::label();
+                    $action = false;
+                    $field = true;
+                    $fieldType = 'readonly';
+                } else if (str_contains($permissionDisplay, '(Hidden)') ) {
+                    $permissionDisplay = str_replace('(Hidden)','',$permissionDisplay);
+                    $group = $resourceClass::label();
+                    $action = false;
+                    $field = true;
+                    $fieldType = 'hidden';
                 } else {
                     // Normal Resource Permission
                     $group = $resourceClass::label();
+                    $field = false;
                 }
 
                 return [
@@ -73,6 +92,8 @@ class Permission extends Field
                     'value' => $permission->id,
                     'resource' => $group,
                     'action' => $action,
+                    'field' => $field,
+                    'fieldType' => $fieldType
                 ];
             })->values()->all(),
         ]);

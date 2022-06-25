@@ -6,6 +6,7 @@ Nova.booting((Vue) => {
   Vue.component("index-permission-field", require("./components/fields/permission/IndexField").default);
   Vue.component("detail-permission-field", require("./components/fields/permission/DetailField").default);
   Vue.component("form-permission-field", require("./components/fields/permission/FormField").default);
-  
+
+  Vue.component("accordion", require("./components/Accordion").default);  
     Nova.inertia("PermissionTool", require("./components/Tool").default);
   });

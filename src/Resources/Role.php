@@ -2,6 +2,7 @@
 
 namespace DigitalCloud\PermissionTool\Resources;
 
+use Exception;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Fields\ID;
@@ -82,7 +83,7 @@ class Role extends Resource
                 ->creationRules('unique:' . config('permission.table_names.roles'))
                 ->updateRules('unique:' . config('permission.table_names.roles') . ',name,{{resourceId}}'),
 
-            \DigitalCloud\PermissionTool\Fields\Permission::make(__('PermissionTool::resources.Permissions'), 'permissions')->onlyOnForms(),
+            \DigitalCloud\PermissionTool\Fields\Permission::make(__('PermissionTool::resources.Permissions'), 'permissions')->onlyOnForms()->stacked()->size('w-full'),
 
             Text::make('permissions count')->withMeta(['value' => count($this->permissions)])->exceptOnForms(),
             // Text::make('users count')->withMeta(['value' => count($this->users)])->exceptOnForms(),
@@ -126,17 +127,57 @@ class Role extends Resource
             }
 
             // add resource actions
-            $object = new $resource($resource::$model);
-            foreach ($object->actions($request) as $action) {
-                if ($action->name) {
-                    $name = $action->name . "-$resource";
-                } else {
-                    $name = get_class($action) . "-$resource";
+            $resourceInstance = new $resource($resource::$model);
+            $this->setupActionPermissions($request, $resourceInstance, $resource);
+            $this->setupFieldPermissions($request, $resourceInstance, $resource);
+        }
+    }
+
+    protected function setupActionPermissions($request, $resourceInstance, $resource)
+    {
+        foreach ($resourceInstance->actions($request) as $action) {
+            if ($action->name) {
+                $name = $action->name . "-$resource";
+            } else {
+                $name = get_class($action) . "-$resource";
+            }
+            $this->rolePermissions[] = $name;
+        }
+    }
+
+    protected function setupFieldPermissions($request, $resourceInstance, $resource)
+    {
+        if (!in_array($resource, ['DigitalCloud\PermissionTool\Resources\Role', 'DigitalCloud\PermissionTool\Resources\Permission'])) {
+            foreach ($resourceInstance->fields($request) as $field) {
+                if (in_array(get_class($field), ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
+                    $field->data = collect($field->data)->each(function($nestedField) use($resource) {
+                        $this->getHiddenFieldPermission($nestedField, $resource);
+                        $this->getReadOnlyFieldPermission($nestedField, $resource);
+                    });
+                    continue;
                 }
-                $this->rolePermissions[] = $name;
+                $this->getHiddenFieldPermission($field, $resource);
+                $this->getReadOnlyFieldPermission($field, $resource);
             }
         }
     }
+
+    protected function getHiddenFieldPermission($field, $resource) {
+        if ($field->attribute) {
+            $name = $field->attribute . " (hidden)" . "-$resource";
+            $this->rolePermissions[] = $name;
+        }
+    }
+
+    protected function getReadOnlyFieldPermission($field, $resource) {
+        if ($field->attribute) {
+            $name = $field->attribute . " (readonly)" . "-$resource";
+            $this->rolePermissions[] = $name;
+        }
+    }
+
+
+    
 
     protected function setupToolPermissions()
     {
@@ -152,7 +193,6 @@ class Role extends Resource
         }
     }
 
-
     protected function setupCustomPermissions()
     {
         $permissions = config('permission.permissions.custom_permissions', []);
@@ -167,6 +207,7 @@ class Role extends Resource
             }
         }
     }
+
 
     protected function syncPermissions()
     {

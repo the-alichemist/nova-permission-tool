@@ -7,8 +7,11 @@ use Laravel\Nova\Tool;
 use Illuminate\Http\Request;
 use Laravel\Nova\Menu\MenuItem;
 use Laravel\Nova\Menu\MenuSection;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Events\ServingNova;
+use Laravel\Nova\Http\Requests\NovaRequest;
 use DigitalCloud\PermissionTool\Resources\Role;
 use DigitalCloud\PermissionTool\Resources\Permission;
 use DigitalCloud\PermissionTool\Policies\AbstractPolicy;
@@ -47,11 +50,11 @@ class PermissionTool extends Tool
         //     MenuItem::resource(Role::class),
         //     MenuItem::resource(Permission::class),
         // ])
-            
+
         //     ->icon('server');
     }
-        
-    
+
+
     public function roleResource(string $roleResource)
     {
         $this->roleResource = $roleResource;
@@ -82,6 +85,59 @@ class PermissionTool extends Tool
         }
     }
 
+    public static function registerFieldPermissions($resourceInstance, $fieldsList) {
+        $fieldsWithPermissions = [];
+        $resource = get_class($resourceInstance);
+        foreach($fieldsList as $field) {
+            if (in_array(get_class($field), ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
+                $field->data = collect($field->data)->each(function($nestedField) use($resource) {
+                    return self::checkFieldPermission($nestedField, $resource);
+                })->toArray();
+                $fieldsWithPermissions[] = $field;
+                continue;
+            }
+            
+            $fieldsWithPermissions[] = self::checkFieldPermission($field, $resource);
+        }
+        return $fieldsWithPermissions;
+    }
+
+    public static function checkFieldPermission($field, $resource) { 
+        if ($field->attribute) {
+
+            $field->readonly(function () use ($field, $resource) {
+                return Gate::check($field->attribute . " (readonly)" . "-$resource");
+            });
+            $field->canSee(function () use ($field, $resource) {
+                $filteredRoles = Auth::user()->roles->filter(function($role) use ($field, $resource) {
+                    return !$role->hasPermissionTo($field->attribute . " (hidden)" . "-$resource");
+                });
+    
+                return $filteredRoles->count();
+                // return Gate::denies($field->attribute . " (hidden)" . "-$resource");
+            });
+        }
+        return $field;
+    }
+
+
+    public static function registerToolPermissions() {
+        $tools = collect(Nova::$tools)->filter(function ($tool) {
+            return $tool->menu(request()) && !in_array(get_class($tool), [
+                // Laravel Nova Offical Resources
+                'Laravel\Nova\Tools\Dashboard',
+                'Laravel\Nova\Tools\ResourceManager',
+                // -----END----
+                "DigitalCloud\PermissionTool\PermissionTool"
+            ]);
+        });
+        $tools->each(function ($tool) {
+            $tool->canSee(function () use ($tool) {
+                return Gate::check(static::getToolPermission($tool));
+            });
+        });
+    }
+
     /**
      * @param String $tool
      * @return String
@@ -94,20 +150,22 @@ class PermissionTool extends Tool
     public static function register()
     {
         Nova::serving(function (ServingNova $event) {
-            $tools = collect(Nova::$tools)->filter(function ($tool) {
-                return $tool->menu(request()) && !in_array(get_class($tool), [
-                    // Laravel Nova Offical Resources
-                    'Laravel\Nova\Tools\Dashboard',
-                    'Laravel\Nova\Tools\ResourceManager',
-                    // -----END----
-                    "DigitalCloud\PermissionTool\PermissionTool"
-                ]);
-            });
-            $tools->each(function ($tool) {
-                $tool->canSee(function () use ($tool) {
-                    return Gate::check(static::getToolPermission($tool));
-                });
-            });
+            //self::registerFieldPermissions();
+            self::registerToolPermissions();
+            // $tools = collect(Nova::$tools)->filter(function ($tool) {
+            //     return $tool->menu(request()) && !in_array(get_class($tool), [
+            //         // Laravel Nova Offical Resources
+            //         'Laravel\Nova\Tools\Dashboard',
+            //         'Laravel\Nova\Tools\ResourceManager',
+            //         // -----END----
+            //         "DigitalCloud\PermissionTool\PermissionTool"
+            //     ]);
+            // });
+            // $tools->each(function ($tool) {
+            //     $tool->canSee(function () use ($tool) {
+            //         return Gate::check(static::getToolPermission($tool));
+            //     });
+            // });
         });
     }
 }
