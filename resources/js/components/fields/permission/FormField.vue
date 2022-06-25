@@ -128,7 +128,7 @@
         <div class="ml-14">
           <h2 class="text-xl my-11 ml-2">Tool Permissions</h2>
           <div class="ml-5 mb-7" v-if="tools.length > 0">
-            <div class="flex items-center">
+            <div class="flex items-center whitespace-nowrap">
               <div
                 v-for="option in tools"
                 :key="option.value"
