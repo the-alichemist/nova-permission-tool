@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Events\ServingNova;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use DigitalCloud\PermissionTool\Resources\Role;
 use DigitalCloud\PermissionTool\Resources\Permission;
 use DigitalCloud\PermissionTool\Policies\AbstractPolicy;
+use DigitalCloud\PermissionTool\Services\InitializePermissions;
 
 class PermissionTool extends Tool
 {
@@ -35,6 +37,7 @@ class PermissionTool extends Tool
 
         Nova::script('PermissionTool', __DIR__ . '/../dist/js/tool.js');
         Nova::style('PermissionTool', __DIR__ . '/../dist/css/tool.css');
+        
 
         $this->registerPolicies();
     }
@@ -159,22 +162,13 @@ class PermissionTool extends Tool
     public static function register()
     {
         Nova::serving(function (ServingNova $event) {
-            //self::registerFieldPermissions();
+            $lock = Cache::lock('permissionsInit', 86400);
+
+            if ($lock->get()) {
+                (new InitializePermissions)->handle((new NovaRequest));
+            }
             self::registerToolPermissions();
-            // $tools = collect(Nova::$tools)->filter(function ($tool) {
-            //     return $tool->menu(request()) && !in_array(get_class($tool), [
-            //         // Laravel Nova Offical Resources
-            //         'Laravel\Nova\Tools\Dashboard',
-            //         'Laravel\Nova\Tools\ResourceManager',
-            //         // -----END----
-            //         "DigitalCloud\PermissionTool\PermissionTool"
-            //     ]);
-            // });
-            // $tools->each(function ($tool) {
-            //     $tool->canSee(function () use ($tool) {
-            //         return Gate::check(static::getToolPermission($tool));
-            //     });
-            // });
+            
         });
     }
 }
