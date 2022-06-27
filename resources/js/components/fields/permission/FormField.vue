@@ -2,88 +2,59 @@
   <default-field :field="field" class="w-full">
     <template v-slot:field class="w-full">
       <h2 class="text-xl my-11 ml-2">CRUD Permissions</h2>
-      <table class="table-fixed">
-        <thead class="bg-gray-100">
-          <tr>
+      <table class="table-fixed border-collapse">
+        <thead class="bg-gray-100 text-black">
+          <tr class="text-base">
             <th
               v-for="resourceColumn in resourceColumns"
               :key="resourceColumn"
               scope="col"
-              class="text-sm font-medium px-4 py-4"
+              class="font-medium px-3 py-4"
             >
               {{ resourceColumn }}
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr class="" v-for="group in availableGroups" :key="group.name">
-            <td class="flex items-center py-1 pl-5">
-              <checkbox
-                class="mr-1"
-                @input="selectAllGroupedOptions(group.options)"
-                :name="group.name"
-                :checked="isAllGroupedOptionsSelected(group.options)"
-                >&nbsp;</checkbox
-              >
-              <h2 class="text-base">{{ group.name }}</h2>
-            </td>
-
-            <td class="" v-for="option in group.options" :key="option.value">
-              <div class="flex items-center">
+          <template v-for="group in availableGroups" :key="group.name">
+            <tr class="border-t border-slate-300">
+              <td class="flex items-center py-1 pl-5">
                 <checkbox
-                  class="py-2 m-auto"
-                  @click="handleChange(option.value)"
-                  :name="field.name"
-                  :checked="options[option.value]"
-                ></checkbox>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                  class="mr-1"
+                  @input="selectAllGroupedOptions(group.options)"
+                  :name="group.name"
+                  :checked="isAllGroupedOptionsSelected(group.options)"
+                  >&nbsp;</checkbox
+                >
+                <h2
+                  class="text-base cursor-pointer"
+                  @click="setFieldState(group.name)"
+                >
+                  {{ group.name }}
+                </h2>
+              </td>
 
-      <div class="flex">
-        <div class="w-1/2">
-          <h2 class="text-xl my-11 ml-2">Action and Field Permissions</h2>
-          <div v-for="group in availableGroups" :key="group.name">
-            <accordion>
-              <template #title>
-                {{ group.name }}
-              </template>
-
-              <template #toggleable>
-                <div class="ml-5 mb-7 my-2" v-if="group.actions.length > 0">
-                  <!-- <h4 class="text-lg my-2">Actions</h4> -->
-                  <div class="flex items-center">
-                    <div
-                      v-for="option in group.actions"
-                      :key="option.value"
-                      class="flex mb-1 mr-10"
-                    >
-                      <div>
-                        <checkbox
-                          @click="handleChange(option.value)"
-                          class="py-2 mr-1"
-                          :name="field.name"
-                          :checked="options[option.value]"
-                        ></checkbox>
-                        <label
-                          :for="field.name"
-                          v-text="option.display"
-                        ></label>
-                      </div>
-                    </div>
-                  </div>
+              <td class="" v-for="option in group.options" :key="option.value">
+                <div class="flex items-center">
+                  <checkbox
+                    class="py-2 m-auto"
+                    @click="handleChange(option.value)"
+                    :name="field.name"
+                    :checked="options[option.value]"
+                  ></checkbox>
                 </div>
-
-                <table class="table-fixed min-w-full w-40">
+              </td>
+            </tr>
+            <tr class="" v-if="getFieldState(group.name)">
+              <td class="px-10 border-b border-slate-300" colspan="12">
+                <table class="table-fixed border-collapse min-w-full w-40 my-5">
                   <thead class="bg-gray-100">
                     <tr>
                       <th
                         v-for="fieldColumn in fieldColumns"
                         :key="fieldColumn"
                         scope="col"
-                        class="text-sm font-medium py-4"
+                        class="text-sm font-medium py-2"
                       >
                         {{ fieldColumn }}
                       </th>
@@ -121,29 +92,63 @@
                     </tr>
                   </tbody>
                 </table>
-              </template>
-            </accordion>
-          </div>
-        </div>
-        <div class="ml-14">
-          <h2 class="text-xl my-11 ml-2">Tool Permissions</h2>
-          <div class="ml-5 mb-7" v-if="tools.length > 0">
-            <div class="items-center whitespace-nowrap">
-              <div
-                v-for="option in tools"
-                :key="option.value"
-                class="mb-1 mr-10 my-3 text-base"
-              >
-                <div class="grid grid-cols-2 justify-items-center">
-                  <label class="ml-0 mr-auto" :for="field.name" v-text="option.display"></label>
-                  <checkbox
-                    @click="handleChange(option.value)"
-                    class="py-2 mr-1"
-                    :name="field.name"
-                    :checked="options[option.value]"
-                  ></checkbox>
-                  <!-- <label :for="field.name" v-text="option.display"></label> -->
+
+                <div class="mb-7 my-2" v-if="group.actions.length > 0">
+                  <div
+                    class="bg-gray-100 inline-flex items-center leading-none my-3 px-2 py-2.5 w-full"
+                  >
+                    Actions
+                  </div>
+
+                  <!-- <h4 class="text-lg my-2">Actions</h4> -->
+                  <div class="flex items-center ml-5">
+                    <div
+                      v-for="option in group.actions"
+                      :key="option.value"
+                      class="flex mb-1 mr-10"
+                    >
+                      <div>
+                        <checkbox
+                          @click="handleChange(option.value)"
+                          class="py-2 mr-1"
+                          :name="field.name"
+                          :checked="options[option.value]"
+                        ></checkbox>
+                        <label
+                          :for="field.name"
+                          v-text="option.display"
+                        ></label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+
+      <div>
+        <h2 class="text-xl mt-11 mb-7 ml-2">Tool Permissions</h2>
+        <div class="ml-5 mb-7 w-72" v-if="tools.length > 0">
+          <div class="items-center whitespace-nowrap">
+            <div
+              v-for="option in tools"
+              :key="option.value"
+              class="mb-1 mr-10 my-3 text-base"
+            >
+              <div class="grid grid-cols-2 justify-items-center items-center">
+                <label
+                  class="ml-0 mr-auto"
+                  :for="field.name"
+                  v-text="option.display"
+                ></label>
+                <checkbox
+                  @click="handleChange(option.value)"
+                  class="mt-1"
+                  :name="field.name"
+                  :checked="options[option.value]"
+                ></checkbox>
               </div>
             </div>
           </div>
@@ -162,6 +167,8 @@ export default {
   props: ["resourceName", "resourceId", "field"],
 
   data: () => ({
+    fieldsViewStates: {},
+    show: false,
     options: [],
     fieldColumns: ["Fields", "Hidden", "Readonly"],
     resourceColumns: [
@@ -215,10 +222,23 @@ export default {
         }
       });
 
-      return _.toArray(groups);
+      let groupsArray = _.toArray(groups);
+      let fieldsViewStates = {};
+      _.map(groupsArray, function (group) {
+        fieldsViewStates[group.name] = false;
+      });
+      this.fieldsViewStates = fieldsViewStates;
+
+      return groupsArray;
     },
   },
   methods: {
+    getFieldState(groupName) {
+      return this.fieldsViewStates[groupName];
+    },
+    setFieldState(groupName) {
+      this.fieldsViewStates[groupName] = !this.fieldsViewStates[groupName];
+    },
     /*
      * Set the initial, internal value for the field.
      */
