@@ -108,8 +108,11 @@ class PermissionTool extends Tool
 
     public static function checkFieldPermission($field, $resource)
     {
-        if ($field->attribute) {
+        if (!Auth::user()->roles->count()) {
+            return $field;
+        }
 
+        if ($field->attribute) {
             $field->readonly(function () use ($field, $resource) {
                 if ($field->attribute === 'ComputedField') {
                     return Gate::check($field->name . " (readonly)" . "-$resource");
@@ -125,7 +128,6 @@ class PermissionTool extends Tool
                 });
 
                 return $filteredRoles->count();
-                // return Gate::denies($field->attribute . " (hidden)" . "-$resource");
             });
         }
         return $field;
