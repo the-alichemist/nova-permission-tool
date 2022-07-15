@@ -45,9 +45,9 @@ trait AuthorizedQueries
         }
 
         // Record belongsTo or is AssignedTo User
-        if ($resource::$model === $query->getModel()::class && method_exists($query->getModel(), 'users') ) {
+        if ($resource::$model === $query->getModel()::class && method_exists($query->getModel(), 'assignees') ) {
             return $query->where(function ($q) {
-                $q->whereHas('users', function ($q) {
+                $q->whereHas('assignees', function ($q) {
                     $q->where('users.id', request()->user()->id);
                 })->orWhere(config('permission.column_names.user_id'), request()->user()->id);
             });
