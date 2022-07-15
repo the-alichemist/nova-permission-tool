@@ -39,7 +39,7 @@ class AbstractPolicy
                 return true;
             }
 
-            if (in_array($resource, config('permission.permissions.resources_with_assign_users', []))) {
+            if (method_exists($record, 'users')) {
                 return $record->users->firstWhere('id', request()->user()->id);
             }
         }
