@@ -35,11 +35,22 @@ class PermissionTool extends Tool
             $this->permissionResource,
         ]);
 
-        $lock = Cache::lock('permissionsInit', 86400);
+        // if (env('APP_ENV') === 'local') {
+        //     (new InitializePermissions)->handle((new NovaRequest));
+        // } else {
+        //     $lock = Cache::lock('permissionsInit', 86400);
+    
+        //     if ($lock->get()) {
+        //         (new InitializePermissions)->handle((new NovaRequest));
+        //     }
+        // }
 
+        $lock = Cache::lock('permissionsInit', 86400);
+    
         if ($lock->get()) {
             (new InitializePermissions)->handle((new NovaRequest));
         }
+
 
         Nova::script('PermissionTool', __DIR__ . '/../dist/js/tool.js');
         Nova::style('PermissionTool', __DIR__ . '/../dist/css/tool.css');
@@ -115,6 +126,10 @@ class PermissionTool extends Tool
     public static function checkFieldPermission($field, $resource)
     {
         if (!Auth::user()->roles->count()) {
+            return $field;
+        }
+
+        if (in_array($field->attribute, config('permission.permissions.excluded_fields'))) {
             return $field;
         }
 

@@ -75,6 +75,9 @@ class InitializePermissions
                     });
                     continue;
                 }
+                if (in_array($field->attribute, config('permission.permissions.excluded_fields'))) {
+                    continue;
+                }
                 $this->getHiddenFieldPermission($field, $resource);
                 $this->getReadOnlyFieldPermission($field, $resource);
             }
@@ -83,6 +86,7 @@ class InitializePermissions
 
     protected function getHiddenFieldPermission($field, $resource)
     {
+
         if ($field->attribute) {
             $name = $field->attribute . " (hidden)" . "-$resource";
             if ($field->attribute === 'ComputedField') {
@@ -94,6 +98,8 @@ class InitializePermissions
 
     protected function getReadOnlyFieldPermission($field, $resource)
     {
+        
+
         if ($field->attribute) {
             $name = $field->attribute . " (readonly)" . "-$resource";
             if ($field->attribute === 'ComputedField') {
