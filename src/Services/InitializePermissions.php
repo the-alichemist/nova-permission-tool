@@ -22,6 +22,7 @@ class InitializePermissions
     {
         $this->setupResourcePermissions($request);
         $this->setupToolPermissions();
+        $this->setupDashboardPermisisons();
         $this->setupCustomPermissions();
         $this->syncPermissions();
     }
@@ -58,7 +59,7 @@ class InitializePermissions
             if ($action->name) {
                 $name = $action->name . "-$resource";
             } else {
-                $name = get_class($action) . "-$resource";
+                $name = $action::class . "-$resource";
             }
             $this->rolePermissions[] = $name;
         }
@@ -68,7 +69,7 @@ class InitializePermissions
     {
         if (!in_array($resource, ['DigitalCloud\PermissionTool\Resources\Role', 'DigitalCloud\PermissionTool\Resources\Permission'])) {
             foreach ($resourceInstance->fields($request) as $field) {
-                if (in_array(get_class($field), ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
+                if (in_array($field::class, ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
                     $field->data = collect($field->data)->each(function ($nestedField) use ($resource) {
                         $this->getHiddenFieldPermission($nestedField, $resource);
                         $this->getReadOnlyFieldPermission($nestedField, $resource);
@@ -115,7 +116,7 @@ class InitializePermissions
     protected function setupToolPermissions()
     {
         $tools = collect(Nova::$tools)->filter(function ($tool) {
-            return $tool->menu(request()) && !in_array(get_class($tool), [
+            return $tool->menu(request()) && !in_array($tool::class, [
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
                 "DigitalCloud\PermissionTool\PermissionTool"
@@ -123,6 +124,17 @@ class InitializePermissions
         })->toArray();
         foreach ($tools as $tool) {
             $this->rolePermissions[] = PermissionTool::getToolPermission($tool);
+        }
+    }
+
+    public function setupDashboardPermisisons() {
+        $dashboards = collect(Nova::$dashboards)->filter(function ($dashboard) {
+            return !in_array($dashboard::class, [
+                'App\Nova\Dashboards\Main',
+            ]);
+        })->toArray();
+        foreach ($dashboards as $dashboard) {
+            $this->rolePermissions[] = PermissionTool::getDashboardPermission($dashboard);
         }
     }
 

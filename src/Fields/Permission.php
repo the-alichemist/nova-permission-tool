@@ -66,6 +66,9 @@ class Permission extends Field
                 if ($resourceClass == 'Laravel\Nova\Tool') {
                     $group = 'Tools';
                     $action = false;
+                } else if ($resourceClass == 'Laravel\Nova\Dashboard') {
+                    $group = 'Dashbaords';
+                    $action = false;
                 } else if ($resourceClass == 'CustomPermission') {
                     $group = 'Custom Permission';
                     $action = false;

@@ -128,27 +128,56 @@
         </tbody>
       </table>
 
-      <div>
-        <h2 class="text-xl mt-11 mb-7 ml-2">Tool Permissions</h2>
-        <div class="ml-5 mb-7 w-72" v-if="tools.length > 0">
-          <div class="items-center whitespace-nowrap">
-            <div
-              v-for="option in tools"
-              :key="option.value"
-              class="mb-1 mr-10 my-3 text-base"
-            >
-              <div class="grid grid-cols-2 justify-items-center items-center">
-                <label
-                  class="ml-0 mr-auto"
-                  :for="field.name"
-                  v-text="option.display"
-                ></label>
-                <checkbox
-                  @click="handleChange(option.value)"
-                  class="mt-1"
-                  :name="field.name"
-                  :checked="options[option.value]"
-                ></checkbox>
+      <div class="flex">
+        <div>
+          <h2 class="text-xl mt-11 mb-7 ml-2">Tool Permissions</h2>
+          <div class="ml-5 mb-7 w-72" v-if="tools.length > 0">
+            <div class="items-center whitespace-nowrap">
+              <div
+                v-for="option in tools"
+                :key="option.value"
+                class="mb-1 mr-10 my-3 text-base"
+              >
+                <div class="grid grid-cols-2 justify-items-center items-center">
+                  <label
+                    class="ml-0 mr-auto"
+                    :for="field.name"
+                    v-text="option.display"
+                  ></label>
+                  <checkbox
+                    @click="handleChange(option.value)"
+                    class="mt-1"
+                    :name="field.name"
+                    :checked="options[option.value]"
+                  ></checkbox>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="text-xl mt-11 mb-7 ml-2">Dashboard Permissions</h2>
+          <div class="ml-5 mb-7 w-72" v-if="dashboards.length > 0">
+            <div class="items-center whitespace-nowrap">
+              <div
+                v-for="option in dashboards"
+                :key="option.value"
+                class="mb-1 mr-10 my-3 text-base"
+              >
+                <div class="grid grid-cols-2 justify-items-center items-center">
+                  <label
+                    class="ml-0 mr-auto"
+                    :for="field.name"
+                    v-text="option.display"
+                  ></label>
+                  <checkbox
+                    @click="handleChange(option.value)"
+                    class="mt-1"
+                    :name="field.name"
+                    :checked="options[option.value]"
+                  ></checkbox>
+                </div>
               </div>
             </div>
           </div>
@@ -186,6 +215,7 @@ export default {
       "Detach",
     ],
     tools: [],
+    dashboards: [],
   }),
 
   computed: {
@@ -216,6 +246,9 @@ export default {
             option;
         } else if (option.resource === "Tools") {
           this.tools.push(option);
+          delete groups[option.resource];
+        } else if (option.resource === "Dashbaords") {
+          this.dashboards.push(option);
           delete groups[option.resource];
         } else {
           groups[option.resource].options.push(option);

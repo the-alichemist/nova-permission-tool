@@ -101,16 +101,16 @@ class PermissionTool extends Tool
             $anonymousPolicy = eval("return (new class extends $abstractPolicy {
                 public \$resource = '$resource';
             });");
-            Gate::policy($resource::$model, get_class($anonymousPolicy));
+            Gate::policy($resource::$model, $anonymousPolicy::class);
         }
     }
 
     public static function registerFieldPermissions($resourceInstance, $fieldsList)
     {
         $fieldsWithPermissions = [];
-        $resource = get_class($resourceInstance);
+        $resource = $resourceInstance::class;
         foreach ($fieldsList as $field) {
-            if (in_array(get_class($field), ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
+            if (in_array($field::class, ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
                 $field->data = collect($field->data)->each(function ($nestedField) use ($resource) {
                     return self::checkFieldPermission($nestedField, $resource);
                 })->toArray();
@@ -158,7 +158,7 @@ class PermissionTool extends Tool
     public static function registerToolPermissions()
     {
         $tools = collect(Nova::$tools)->filter(function ($tool) {
-            return $tool->menu(request()) && !in_array(get_class($tool), [
+            return $tool->menu(request()) && !in_array($tool::class, [
                 // Laravel Nova Offical Resources
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
@@ -173,19 +173,39 @@ class PermissionTool extends Tool
         });
     }
 
+    public static function registerDashboardPermissions() {
+        $dashboards = collect(Nova::$dashboards)->filter(function ($dashboard) {
+            return !in_array($dashboard::class, [
+                'App\Nova\Dashboards\Main',
+            ]);
+        });
+        $dashboards->each(function ($dashboard) {
+            $dashboard->canSee(function () use ($dashboard) {
+                return Gate::check(static::getDashboardPermission($dashboard));
+            });
+        });
+    }
+
     /**
      * @param String $tool
      * @return String
      */
     public static function getToolPermission($tool)
     {
-        return sprintf('%s-Laravel\Nova\Tool', get_class($tool));
+        return sprintf('%s-Laravel\Nova\Tool', $tool::class);
     }
+
+    public static function getDashboardPermission($dashboard)
+    {
+        return sprintf('%s-Laravel\Nova\Dashboard', $dashboard::class);
+    }
+
 
     public static function register()
     {
         Nova::serving(function (ServingNova $event) {
             self::registerToolPermissions();
+            self::registerDashboardPermissions();
             
         });
     }
