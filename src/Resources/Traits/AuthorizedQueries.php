@@ -2,14 +2,8 @@
 
 namespace DigitalCloud\PermissionTool\Resources\Traits;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Spatie\Permission\Contracts\Role;
-use Illuminate\Database\Eloquent\Builder;
-use Spatie\Permission\PermissionRegistrar;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Spatie\Permission\Traits\HasPermissions;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait AuthorizedQueries
 {
@@ -22,18 +16,20 @@ trait AuthorizedQueries
      */
     public static function indexQuery(NovaRequest $request, $query)
     {
-        if (!$request->isResourceIndexRequest()) {
+        if (! $request->isResourceIndexRequest()) {
             return $query;
         }
 
         // Do not apply on excluded resources
         $resource = $request->resource();
+
         if (in_array($resource, config('permission.permissions.exclude_resources', []))) {
             return $query;
         }
 
         // Allow view on all records
         $permission = sprintf('viewAny-%s', $resource);
+
         if (Gate::check($permission)) {
             return $query;
         }
@@ -45,7 +41,7 @@ trait AuthorizedQueries
         }
 
         // Record belongsTo or is AssignedTo User
-        if ($resource::$model === $query->getModel()::class && method_exists($query->getModel(), 'assignees') ) {
+        if ($resource::$model === $query->getModel()::class && method_exists($query->getModel(), 'assignees')) {
             return $query->where(function ($q) {
                 $q->whereHas('assignees', function ($q) {
                     $q->where('users.id', request()->user()->id);

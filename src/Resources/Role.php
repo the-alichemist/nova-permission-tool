@@ -2,28 +2,21 @@
 
 namespace DigitalCloud\PermissionTool\Resources;
 
-use Exception;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Resource;
 use Laravel\Nova\Fields\ID;
-use App\Rules\HasPermission;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
-use Illuminate\Validation\Rule;
-use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Fields\BelongsToMany;
-use Fourstacks\NovaCheckboxes\Checkboxes;
 use Spatie\Permission\PermissionRegistrar;
-use DigitalCloud\CheckboxList\CheckboxList;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use DigitalCloud\PermissionTool\PermissionTool;
 use DigitalCloud\PermissionTool\Services\InitializePermissions;
 
 class Role extends Resource
 {
-
     /**
      * The model the resource corresponds to.
      *
@@ -72,10 +65,10 @@ class Role extends Resource
      */
     public function fields(NovaRequest $request)
     {
-        (new InitializePermissions)->handle($request);
+        (new InitializePermissions())->handle($request);
         $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
 
-        $fields =  [
+        $fields = [
             ID::make()->sortable(),
 
             Text::make(__('PermissionTool::roles.name'), 'name')
@@ -92,13 +85,10 @@ class Role extends Resource
 
             // BelongsToMany::make(__('PermissionTool::resources.Permissions'), 'permissions', Permission::class),
             // MorphToMany::make($userResource::label(), 'users', $userResource),
-
-
         ];
 
         return $fields;
     }
-
 
     /**
      * Get the cards available for the request.
@@ -142,7 +132,6 @@ class Role extends Resource
     {
         return [];
     }
-
 
     //    public function authorizedToDelete(Request $request)
     //    {

@@ -8,8 +8,6 @@ use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use DigitalCloud\PermissionTool\Http\Middleware\Authorize;
-use DigitalCloud\PermissionTool\Policies\PermissionPolicy;
-use DigitalCloud\PermissionTool\Policies\RolePolicy;
 
 class ToolServiceProvider extends ServiceProvider
 {
@@ -20,18 +18,18 @@ class ToolServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'PermissionTool');
-        $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'PermissionTool');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'PermissionTool');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'PermissionTool');
 
         $this->publishes([
-            __DIR__.'/../resources/lang' => resource_path('lang/vendor/PermissionTool'),
+            __DIR__ . '/../resources/lang' => resource_path('lang/vendor/PermissionTool'),
         ], 'PermissionTool-lang');
         $this->app->booted(function () {
             $this->routes();
         });
 
         $this->publishes([
-            __DIR__.'/config/permission.php' => config_path('permission.php'),
+            __DIR__ . '/config/permission.php' => config_path('permission.php'),
         ]);
 
         // Super admin all permissions
@@ -42,7 +40,6 @@ class ToolServiceProvider extends ServiceProvider
         });
 
         Nova::serving(function (ServingNova $event) {
-            //
         });
     }
 
@@ -58,11 +55,11 @@ class ToolServiceProvider extends ServiceProvider
         }
 
         Nova::router(['nova', Authorize::class], 'permission-tool')
-            ->group(__DIR__.'/../routes/inertia.php');
+            ->group(__DIR__ . '/../routes/inertia.php');
 
         Route::middleware(['nova', Authorize::class])
-                ->prefix('nova-vendor/PermissionTool')
-                ->group(__DIR__.'/../routes/api.php');
+            ->prefix('nova-vendor/PermissionTool')
+            ->group(__DIR__ . '/../routes/api.php');
     }
 
     /**
@@ -72,6 +69,5 @@ class ToolServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
     }
 }

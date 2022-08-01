@@ -34,7 +34,8 @@ class Role extends Field
         $this->options();
     }
 
-    public function options() {
+    public function options()
+    {
         return $this->withMeta([
             'options' => \DigitalCloud\PermissionTool\Models\Role::get()->map(function ($role) {
                 return [
@@ -44,16 +45,16 @@ class Role extends Field
                         return [
                             'display' => $permission->name,
                             'value' => $permission->id,
-                            'resource' => substr($permission->name, strrpos($permission->name, ' ') + 1)
+                            'resource' => substr($permission->name, strrpos($permission->name, ' ') + 1),
                         ];
-                    })
+                    }),
                 ];
             })->values()->all(),
         ]);
-
     }
 
-    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute) {
+    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
+    {
         if ($request->exists($requestAttribute)) {
             $data = json_decode($request[$requestAttribute]);
             $value = $this->onlyChecked($data);
@@ -61,30 +62,37 @@ class Role extends Field
         }
     }
 
-    public function resolveAttribute($resource, $attribute = null) {
+    public function resolveAttribute($resource, $attribute = null)
+    {
         $value = data_get($resource, $attribute);
 
-        if(! $value) return json_encode($this->withUnchecked([]));
+        if (! $value) {
+            return json_encode($this->withUnchecked([]));
+        }
 
         return json_encode($this->withUnchecked($value->toArray()));
     }
 
-    private function withUnchecked($data) {
+    private function withUnchecked($data)
+    {
         return collect($this->meta['options'])
-            ->mapWithKeys(function($option) use ($data){
-                $value = array_filter($data, function($item) use ($option) { return $option['value'] == $item['id'];});
-                $isChecked = $value? true : false;
+            ->mapWithKeys(function ($option) use ($data) {
+                $value = array_filter($data, function ($item) use ($option) {
+                    return $option['value'] == $item['id'];
+                });
+                $isChecked = $value ? true : false;
+
                 return [ $option['value'] => $isChecked ];
             })->all();
     }
 
-    private function onlyChecked($data) {
+    private function onlyChecked($data)
+    {
         return collect($data)
-            ->filter(function($isChecked){
+            ->filter(function ($isChecked) {
                 return $isChecked;
-            })->map(function($value, $key){
+            })->map(function ($value, $key) {
                 return $key;
             })->values()->all();
     }
-
 }

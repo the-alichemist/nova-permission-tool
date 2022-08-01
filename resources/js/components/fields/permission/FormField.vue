@@ -89,6 +89,16 @@
                           ></checkbox>
                         </div>
                       </td>
+                      <td v-if="option.anonymous">
+                        <div>
+                          <checkbox
+                            @click="handleChange(option.anonymous.value)"
+                            class="py-2 flex items-center m-auto"
+                            :name="field.name"
+                            :checked="options[option.anonymous.value]"
+                          ></checkbox>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -199,7 +209,7 @@ export default {
     fieldsViewStates: {},
     show: false,
     options: [],
-    fieldColumns: ["Fields", "Hidden", "Readonly"],
+    fieldColumns: ["Fields", "Hidden", "Readonly", "Anonymous"],
     resourceColumns: [
       "Resource",
       "Create",
@@ -240,6 +250,7 @@ export default {
             groups[option.resource].fields[option.display] = {
               hidden: "",
               readonly: "",
+              anonymous: null
             };
           }
           groups[option.resource].fields[option.display][option.fieldType] =

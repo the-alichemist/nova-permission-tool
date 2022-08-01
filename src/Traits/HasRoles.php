@@ -33,9 +33,11 @@ trait HasRoles
         });
     }
 
-    public function setRolesAttribute($roles) {
+    public function setRolesAttribute($roles)
+    {
         if (! $this->exists) {
             $this->queuedRoles = $roles;
+
             return;
         }
         $this->syncRoles($roles);
@@ -95,7 +97,7 @@ trait HasRoles
         return $query->whereHas('roles', function ($query) use ($roles) {
             $query->where(function ($query) use ($roles) {
                 foreach ($roles as $role) {
-                    $query->orWhere(config('permission.table_names.roles').'.id', $role->id);
+                    $query->orWhere(config('permission.table_names.roles') . '.id', $role->id);
                 }
             });
         });
@@ -139,13 +141,15 @@ trait HasRoles
             $class::saved(
                 function ($object) use ($roles, $model) {
                     static $modelLastFiredOn;
+
                     if ($modelLastFiredOn !== null && $modelLastFiredOn === $model) {
                         return;
                     }
                     $object->roles()->sync($roles, false);
                     $object->load('roles');
                     $modelLastFiredOn = $object;
-                });
+                }
+            );
         }
 
         $this->forgetCachedPermissions();
@@ -307,4 +311,3 @@ trait HasRoles
         return explode('|', trim($pipeString, $quoteCharacter));
     }
 }
-

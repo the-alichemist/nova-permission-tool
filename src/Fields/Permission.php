@@ -2,7 +2,6 @@
 
 namespace DigitalCloud\PermissionTool\Fields;
 
-use DigitalCloud\PermissionTool\Models\Role;
 use Illuminate\Support\Str;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -48,10 +47,10 @@ class Permission extends Field
         return $this->withMeta([
             'options' => \DigitalCloud\PermissionTool\Models\Permission::get()->map(function ($permission) {
                 $permissionDisplay = substr($permission->name, 0, strrpos($permission->name, '-'));
-                $action = !in_array($permissionDisplay, config('permission.permissions.resource'))
-                    && !in_array($permissionDisplay, collect(config('permission.permissions.custom_permissions'))->flatten()->toArray())
-                    && !str_contains($permissionDisplay, '(readonly)')
-                    && !str_contains($permissionDisplay, '(hidden)');
+                $action = ! in_array($permissionDisplay, config('permission.permissions.resource'))
+                    && ! in_array($permissionDisplay, collect(config('permission.permissions.custom_permissions'))->flatten()->toArray())
+                    && ! str_contains($permissionDisplay, '(readonly)')
+                    && ! str_contains($permissionDisplay, '(hidden)');
 
                 $field = str_contains($permissionDisplay, '(readonly)')
                 && str_contains($permissionDisplay, '(hidden)');
@@ -66,24 +65,30 @@ class Permission extends Field
                 if ($resourceClass == 'Laravel\Nova\Tool') {
                     $group = 'Tools';
                     $action = false;
-                } else if ($resourceClass == 'Laravel\Nova\Dashboard') {
+                } elseif ($resourceClass == 'Laravel\Nova\Dashboard') {
                     $group = 'Dashbaords';
                     $action = false;
-                } else if ($resourceClass == 'CustomPermission') {
+                } elseif ($resourceClass == 'CustomPermission') {
                     $group = 'Custom Permission';
                     $action = false;
-                } else if (str_contains($permissionDisplay, '(Readonly)') ) {
-                    $permissionDisplay = str_replace('(Readonly)','',$permissionDisplay);
+                } elseif (str_contains($permissionDisplay, '(Readonly)')) {
+                    $permissionDisplay = str_replace('(Readonly)', '', $permissionDisplay);
                     $group = $resourceClass::label();
                     $action = false;
                     $field = true;
                     $fieldType = 'readonly';
-                } else if (str_contains($permissionDisplay, '(Hidden)') ) {
-                    $permissionDisplay = str_replace('(Hidden)','',$permissionDisplay);
+                } elseif (str_contains($permissionDisplay, '(Hidden)')) {
+                    $permissionDisplay = str_replace('(Hidden)', '', $permissionDisplay);
                     $group = $resourceClass::label();
                     $action = false;
                     $field = true;
                     $fieldType = 'hidden';
+                } elseif (str_contains($permissionDisplay, '(Anonymous)')) {
+                    $permissionDisplay = str_replace('(Anonymous)', '', $permissionDisplay);
+                    $group = $resourceClass::label();
+                    $action = false;
+                    $field = true;
+                    $fieldType = 'anonymous';
                 } else {
                     // Normal Resource Permission
                     $group = $resourceClass::label();
@@ -96,7 +101,7 @@ class Permission extends Field
                     'resource' => $group,
                     'action' => $action,
                     'field' => $field,
-                    'fieldType' => $fieldType
+                    'fieldType' => $fieldType,
                 ];
             })->values()->all(),
         ]);
@@ -128,7 +133,6 @@ class Permission extends Field
         $attribute
     ) {
         if ($request->exists($requestAttribute)) {
-
             $data = json_decode($request[$requestAttribute]);
 
             if ($this->shouldSaveAsString()) {
@@ -147,14 +151,18 @@ class Permission extends Field
     {
         $value = data_get($resource, $attribute);
 
-        if (!$value) return json_encode($this->withUnchecked([]));
+        if (! $value) {
+            return json_encode($this->withUnchecked([]));
+        }
 
         if (is_array($value)) {
             if ($this->arrayIsAssoc($value)) {
                 $all = $this->withUnchecked([]);
                 $mer = array_merge($all, $value);
+
                 return json_encode($mer);
             }
+
             return json_encode($this->withUnchecked($value));
         }
 
@@ -169,6 +177,7 @@ class Permission extends Field
                     return $option['value'] == $item['id'];
                 });
                 $isChecked = $value ? true : false;
+
                 return [$option['value'] => $isChecked];
             })
             ->all();
@@ -176,7 +185,6 @@ class Permission extends Field
 
     private function onlyChecked($data)
     {
-
         return collect($data)
             ->filter(function ($isChecked) {
                 return $isChecked;
@@ -190,7 +198,9 @@ class Permission extends Field
 
     private function arrayIsAssoc(array $array)
     {
-        if ([] === $array) return false;
+        if ([] === $array) {
+            return false;
+        }
 
         return array_keys($array) !== range(0, count($array) - 1);
     }

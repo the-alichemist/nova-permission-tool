@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace DigitalCloud\PermissionTool\Policies;
 
-use Laravel\Nova\Nova;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -23,7 +22,7 @@ class AbstractPolicy
         $resource = $this->resourceClass();
         $permission = sprintf('%s-%s', $permission, $resource);
 
-        if (!$record) {
+        if (! $record) {
             return Gate::check($permission);
         }
 
@@ -31,7 +30,7 @@ class AbstractPolicy
         $hasUserAttribute = array_key_exists($userIdCol, $record->getAttributes());
 
         if (Gate::check($permission)) {
-            if (!$hasUserAttribute) {
+            if (! $hasUserAttribute) {
                 return true;
             }
 

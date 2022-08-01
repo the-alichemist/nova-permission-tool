@@ -7,7 +7,6 @@ use Laravel\Nova\Tool;
 use Illuminate\Http\Request;
 use Laravel\Nova\Menu\MenuItem;
 use Laravel\Nova\Menu\MenuSection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Nova\Events\ServingNova;
@@ -39,22 +38,20 @@ class PermissionTool extends Tool
         //     (new InitializePermissions)->handle((new NovaRequest));
         // } else {
         //     $lock = Cache::lock('permissionsInit', 86400);
-    
+
         //     if ($lock->get()) {
         //         (new InitializePermissions)->handle((new NovaRequest));
         //     }
         // }
 
         $lock = Cache::lock('permissionsInit', 86400);
-    
-        if ($lock->get()) {
-            (new InitializePermissions)->handle((new NovaRequest));
-        }
 
+        if ($lock->get()) {
+            (new InitializePermissions())->handle((new NovaRequest()));
+        }
 
         Nova::script('PermissionTool', __DIR__ . '/../dist/js/tool.js');
         Nova::style('PermissionTool', __DIR__ . '/../dist/css/tool.css');
-        
 
         $this->registerPolicies();
     }
@@ -74,7 +71,6 @@ class PermissionTool extends Tool
         //     ->icon('server');
     }
 
-
     public function roleResource(string $roleResource)
     {
         $this->roleResource = $roleResource;
@@ -91,15 +87,15 @@ class PermissionTool extends Tool
 
     public function registerPolicies()
     {
-        $abstractPolicy = AbstractPolicy::class;;
+        $abstractPolicy = AbstractPolicy::class;
         $resources = Nova::$resources;
 
         foreach ($resources as $resource) {
             if ($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
             }
-            $anonymousPolicy = eval("return (new class extends $abstractPolicy {
-                public \$resource = '$resource';
+            $anonymousPolicy = eval("return (new class extends {$abstractPolicy} {
+                public \$resource = '{$resource}';
             });");
             Gate::policy($resource::$model, $anonymousPolicy::class);
         }
@@ -109,23 +105,26 @@ class PermissionTool extends Tool
     {
         $fieldsWithPermissions = [];
         $resource = $resourceInstance::class;
+
         foreach ($fieldsList as $field) {
             if (in_array($field::class, ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
                 $field->data = collect($field->data)->each(function ($nestedField) use ($resource) {
                     return self::checkFieldPermission($nestedField, $resource);
                 })->toArray();
                 $fieldsWithPermissions[] = $field;
+
                 continue;
             }
 
             $fieldsWithPermissions[] = self::checkFieldPermission($field, $resource);
         }
+
         return $fieldsWithPermissions;
     }
 
     public static function checkFieldPermission($field, $resource)
     {
-        if (!Auth::user()->roles->count()) {
+        if (! Auth::user()->roles->count()) {
             return $field;
         }
 
@@ -136,34 +135,36 @@ class PermissionTool extends Tool
         if ($field->attribute) {
             $field->readonly(function () use ($field, $resource) {
                 if ($field->attribute === 'ComputedField') {
-                    return Gate::check($field->name . " (readonly)" . "-$resource");
+                    return Gate::check($field->name . ' (readonly)' . "-{$resource}");
                 }
-                return Gate::check($field->attribute . " (readonly)" . "-$resource");
+
+                return Gate::check($field->attribute . ' (readonly)' . "-{$resource}");
             });
             $field->canSee(function () use ($field, $resource) {
                 $filteredRoles = Auth::user()->roles->filter(function ($role) use ($field, $resource) {
                     if ($field->attribute === 'ComputedField') {
-                        return !$role->hasPermissionTo($field->name . " (hidden)" . "-$resource");
+                        return ! $role->hasPermissionTo($field->name . ' (hidden)' . "-{$resource}");
                     }
-                    return !$role->hasPermissionTo($field->attribute . " (hidden)" . "-$resource");
+
+                    return ! $role->hasPermissionTo($field->attribute . ' (hidden)' . "-{$resource}");
                 });
 
                 return $filteredRoles->count();
             });
         }
+
         return $field;
     }
-
 
     public static function registerToolPermissions()
     {
         $tools = collect(Nova::$tools)->filter(function ($tool) {
-            return $tool->menu(request()) && !in_array($tool::class, [
+            return $tool->menu(request()) && ! in_array($tool::class, [
                 // Laravel Nova Offical Resources
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
                 // -----END----
-                "DigitalCloud\PermissionTool\PermissionTool"
+                "DigitalCloud\PermissionTool\PermissionTool",
             ]);
         });
         $tools->each(function ($tool) {
@@ -173,9 +174,10 @@ class PermissionTool extends Tool
         });
     }
 
-    public static function registerDashboardPermissions() {
+    public static function registerDashboardPermissions()
+    {
         $dashboards = collect(Nova::$dashboards)->filter(function ($dashboard) {
-            return !in_array($dashboard::class, [
+            return ! in_array($dashboard::class, [
                 'App\Nova\Dashboards\Main',
             ]);
         });
@@ -200,13 +202,11 @@ class PermissionTool extends Tool
         return sprintf('%s-Laravel\Nova\Dashboard', $dashboard::class);
     }
 
-
     public static function register()
     {
         Nova::serving(function (ServingNova $event) {
             self::registerToolPermissions();
             self::registerDashboardPermissions();
-            
         });
     }
 }

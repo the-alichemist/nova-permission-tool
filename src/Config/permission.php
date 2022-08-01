@@ -3,9 +3,7 @@
 use DigitalCloud\PermissionTool\Policies\AbstractPolicy;
 
 return [
-
     'models' => [
-
         /*
          * When using the "HasRoles" trait from this package, we need to know which
          * Eloquent model should be used to retrieve your permissions. Of course, it
@@ -35,7 +33,6 @@ return [
     ],
 
     'table_names' => [
-
         /*
          * When using the "HasRoles" trait from this package, we need to know which
          * table should be used to retrieve your roles. We have chosen a basic
@@ -78,7 +75,6 @@ return [
     ],
 
     'column_names' => [
-
         /*
          * Change this if you want to name the related model primary key other than
          * `model_id`.
@@ -91,7 +87,7 @@ return [
         /**
          * User foreign key in tables to check record ownership like $article->user_id == $user->id
          */
-        'user_id' => 'user_id'
+        'user_id' => 'user_id',
     ],
 
     /*
@@ -116,7 +112,7 @@ return [
 
     'permissions' => [
         'admin_emails' => [
-            'example@example.com'
+            'example@example.com',
         ],
         'resource' => [
             'create',
@@ -140,9 +136,8 @@ return [
         ],
         'resources_with_assign_users' => [
             // App\Nova\Task
-        ]
+        ],
     ],
 
-
-    'policy' => AbstractPolicy::class
+    'policy' => AbstractPolicy::class,
 ];

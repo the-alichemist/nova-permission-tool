@@ -1,4 +1,5 @@
 <?php
+
 namespace DigitalCloud\PermissionTool\Services;
 
 use Laravel\Nova\Nova;
@@ -14,7 +15,8 @@ class InitializePermissions
         return $this->rolePermissions;
     }
 
-    public function handle(NovaRequest $request) {
+    public function handle(NovaRequest $request)
+    {
         $this->setupPermission($request);
     }
 
@@ -30,6 +32,7 @@ class InitializePermissions
     protected function setupResourcePermissions(NovaRequest $request)
     {
         $resourcePermissions = config('permission.permissions.resource');
+
         foreach (Nova::$resources as $resource) {
             if ($resource == 'Laravel\Nova\Actions\ActionResource') {
                 continue;
@@ -42,7 +45,7 @@ class InitializePermissions
             // $resourceName = $resource;
 
             foreach ($resourcePermissions as $permission) {
-                $value = "$permission-$resource";
+                $value = "{$permission}-{$resource}";
                 $this->rolePermissions[] = $value;
             }
 
@@ -57,9 +60,9 @@ class InitializePermissions
     {
         foreach ($resourceInstance->actions($request) as $action) {
             if ($action->name) {
-                $name = $action->name . "-$resource";
+                $name = $action->name . "-{$resource}";
             } else {
-                $name = $action::class . "-$resource";
+                $name = $action::class . "-{$resource}";
             }
             $this->rolePermissions[] = $name;
         }
@@ -67,31 +70,35 @@ class InitializePermissions
 
     protected function setupFieldPermissions($request, $resourceInstance, $resource)
     {
-        if (!in_array($resource, ['DigitalCloud\PermissionTool\Resources\Role', 'DigitalCloud\PermissionTool\Resources\Permission'])) {
+        if (! in_array($resource, ['DigitalCloud\PermissionTool\Resources\Role', 'DigitalCloud\PermissionTool\Resources\Permission'])) {
             foreach ($resourceInstance->fields($request) as $field) {
                 if (in_array($field::class, ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
                     $field->data = collect($field->data)->each(function ($nestedField) use ($resource) {
                         $this->getHiddenFieldPermission($nestedField, $resource);
                         $this->getReadOnlyFieldPermission($nestedField, $resource);
+                        $this->getAnonymousFieldPermission($nestedField, $resource);
                     });
+
                     continue;
                 }
+
                 if (in_array($field->attribute, config('permission.permissions.excluded_fields'))) {
                     continue;
                 }
                 $this->getHiddenFieldPermission($field, $resource);
                 $this->getReadOnlyFieldPermission($field, $resource);
+                $this->getAnonymousFieldPermission($field, $resource);
             }
         }
     }
 
     protected function getHiddenFieldPermission($field, $resource)
     {
-
         if ($field->attribute) {
-            $name = $field->attribute . " (hidden)" . "-$resource";
+            $name = $field->attribute . ' (hidden)' . "-{$resource}";
+
             if ($field->attribute === 'ComputedField') {
-                $name = $field->name . " (hidden)" . "-$resource";
+                $name = $field->name . ' (hidden)' . "-{$resource}";
             }
             $this->rolePermissions[] = $name;
         }
@@ -99,40 +106,48 @@ class InitializePermissions
 
     protected function getReadOnlyFieldPermission($field, $resource)
     {
-        
-
         if ($field->attribute) {
-            $name = $field->attribute . " (readonly)" . "-$resource";
+            $name = $field->attribute . ' (readonly)' . "-{$resource}";
+
             if ($field->attribute === 'ComputedField') {
-                $name = $field->name . " (hidden)" . "-$resource";
+                $name = $field->name . ' (hidden)' . "-{$resource}";
             }
             $this->rolePermissions[] = $name;
         }
     }
 
+    public function getAnonymousFieldPermission($field, $resource) 
+    {
+        if ($field->attribute && $field->attribute === 'notes') {
+            $name = $field->attribute . ' (anonymous)' . "-{$resource}";
+            $this->rolePermissions[] = $name;
+        }
 
-
+    }
 
     protected function setupToolPermissions()
     {
         $tools = collect(Nova::$tools)->filter(function ($tool) {
-            return $tool->menu(request()) && !in_array($tool::class, [
+            return $tool->menu(request()) && ! in_array($tool::class, [
                 'Laravel\Nova\Tools\Dashboard',
                 'Laravel\Nova\Tools\ResourceManager',
-                "DigitalCloud\PermissionTool\PermissionTool"
+                "DigitalCloud\PermissionTool\PermissionTool",
             ]);
         })->toArray();
+
         foreach ($tools as $tool) {
             $this->rolePermissions[] = PermissionTool::getToolPermission($tool);
         }
     }
 
-    public function setupDashboardPermisisons() {
+    public function setupDashboardPermisisons()
+    {
         $dashboards = collect(Nova::$dashboards)->filter(function ($dashboard) {
-            return !in_array($dashboard::class, [
+            return ! in_array($dashboard::class, [
                 'App\Nova\Dashboards\Main',
             ]);
         })->toArray();
+
         foreach ($dashboards as $dashboard) {
             $this->rolePermissions[] = PermissionTool::getDashboardPermission($dashboard);
         }
@@ -152,7 +167,6 @@ class InitializePermissions
             }
         }
     }
-
 
     protected function syncPermissions()
     {
