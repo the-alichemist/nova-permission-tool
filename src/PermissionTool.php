@@ -199,7 +199,10 @@ class PermissionTool extends Tool
 
     public static function getDashboardPermission($dashboard)
     {
-        return sprintf('%s-Laravel\Nova\Dashboard', $dashboard->name);
+        if ($dashboard->name) {
+            return sprintf('%s-Laravel\Nova\Dashboard', $dashboard->name);
+        }
+        return sprintf('%s-Laravel\Nova\Dashboard', $dashboard::class);
     }
 
     public static function register()
