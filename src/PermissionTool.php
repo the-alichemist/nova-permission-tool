@@ -124,7 +124,7 @@ class PermissionTool extends Tool
 
     public static function checkFieldPermission($field, $resource)
     {
-        if (in_array(Auth::user->email, config('permission.permissions.admin_emails'))) {
+        if (in_array(Auth::user()->email, config('permission.permissions.admin_emails'))) {
             return $field;
         }
 
