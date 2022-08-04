@@ -78,6 +78,7 @@ class Permission extends Resource
             })->canSee(function () {
                 return is_array(__('PermissionTool::permissions.display_names'));
             }),
+            Text::make('Roles Count')->withMeta(['value' => count($this->roles)])->exceptOnForms(),
 
             DateTime::make(__('PermissionTool::permissions.created_at'), 'created_at')->exceptOnForms(),
             DateTime::make(__('PermissionTool::permissions.updated_at'), 'updated_at')->exceptOnForms(),
