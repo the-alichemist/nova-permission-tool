@@ -1,7 +1,21 @@
 <template>
   <default-field :field="field" class="w-full">
     <template v-slot:field class="w-full">
-      <h2 class="text-xl my-11 ml-2">CRUD Permissions</h2>
+      <div class="grid grid-cols-2 my-11">
+        <h2 class="text-xl ml-2">CRUD Permissions</h2>
+        <div class="justify-self-end">
+          <div
+            class="shadow rounded focus:outline-none ring-primary-200 dark:ring-gray-600 focus:ring bg-primary-500 cursor-pointer hover:bg-primary-400 active:bg-primary-600 text-white dark:text-gray-800 inline-flex items-center font-bold px-4 h-9 text-sm flex-shrink-0"
+            @click="selectAllFieldOptions()"
+          >
+            {{
+              areAllFieldOptionsSelected
+                ? __("Deselect All Fields")
+                : __("Select All Fields")
+            }}
+          </div>
+        </div>
+      </div>
       <table class="table-fixed border-collapse">
         <thead class="bg-gray-100 text-black">
           <tr class="text-base">
@@ -207,9 +221,10 @@ export default {
 
   data: () => ({
     fieldsViewStates: {},
+    areAllFieldOptionsSelected: false,
     show: false,
     options: [],
-    fieldColumns: ["Fields", "Visible", "Writable", "Identifiable"],
+    fieldColumns: ["Fields", "Show", "Edit", "Identify User"],
     resourceColumns: [
       "Resource",
       "Create",
@@ -330,7 +345,34 @@ export default {
         _this.options[option.value] = true;
       });
     },
+
+    selectAllFieldOptions() {
+      let _this = this;
+      if (!this.areAllFieldOptionsSelected) {
+        this.availableGroups.forEach(function (group) {
+          return _.forOwn(group.fields, function (option, fieldName) {
+            _this.options[option.visible.value] = true;
+            _this.options[option.writable.value] = true;
+            if (option.identifiable) {
+              _this.options[option.identifiable.value] = true;
+            }
+          });
+        });
+        return (this.areAllFieldOptionsSelected = true);
+      }
+      this.availableGroups.forEach(function (group) {
+        return _.forOwn(group.fields, function (option, fieldName) {
+          _this.options[option.visible.value] = false;
+          _this.options[option.writable.value] = false;
+          if (option.identifiable) {
+            _this.options[option.identifiable.value] = false;
+          }
+        });
+      });
+      return (this.areAllFieldOptionsSelected = false);
+    },
   },
+
   watch: {
     options: {
       handler: function (newOptions) {
@@ -348,7 +390,9 @@ export default {
 
   mounted() {
     if (localStorage.getItem("permission.resourceAccordionState")) {
-      this.fieldsViewStates = JSON.parse(localStorage.getItem("permission.resourceAccordionState"));
+      this.fieldsViewStates = JSON.parse(
+        localStorage.getItem("permission.resourceAccordionState")
+      );
     }
   },
 };
