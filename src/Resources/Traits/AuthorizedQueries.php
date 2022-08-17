@@ -20,9 +20,9 @@ trait AuthorizedQueries
             return $query;
         }
 
-        // Do not apply on excluded resources
         $resource = $request->resource();
 
+        // Do not apply on excluded resources
         if (in_array($resource, config('permission.permissions.exclude_resources', []))) {
             return $query;
         }
@@ -40,8 +40,18 @@ trait AuthorizedQueries
             return $query->where('id', request()->user()->id);
         }
 
-        // Record belongsTo or is AssignedTo User
-        if ($resource::$model === $query->getModel()::class && method_exists($query->getModel(), 'assignees')) {
+        // Record belongsTo or is AssignedTo User or being Watched By
+        if ($resource::$model === $query->getModel()::class && method_exists($query->getModel(), 'assignees') && method_exists($query->getModel(), 'watchers')) {
+            return $query->where(function ($q) {
+                $q->whereHas('assignees', function ($q) {
+                    $q->where('users.id', request()->user()->id);
+                })->orWhere(config('permission.column_names.user_id'), request()->user()->id)
+                ->orWhereHas('watchers', function ($q) {
+                    $q->where('users.id', request()->user()->id);
+                });
+            });
+        } else if ($resource::$model === $query->getModel()::class && method_exists($query->getModel(), 'assignees') && !method_exists($query->getModel(), 'watchers')) {
+            // Record belongsTo or is AssignedTo User
             return $query->where(function ($q) {
                 $q->whereHas('assignees', function ($q) {
                     $q->where('users.id', request()->user()->id);
@@ -49,6 +59,11 @@ trait AuthorizedQueries
             });
         }
 
-        return $query->where(config('permission.column_names.user_id'), request()->user()->id);
+        // Record belongsTo User
+        if (method_exists($query->getModel(), 'owner')) {
+            return $query->where(config('permission.column_names.user_id'), request()->user()->id);
+        }
+
+        return $query;
     }
 }

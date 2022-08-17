@@ -41,6 +41,10 @@ class AbstractPolicy
             if (method_exists($record, 'assignees')) {
                 return $record->assignees->firstWhere('id', request()->user()->id);
             }
+
+            if (method_exists($record, 'watchers')) {
+                return $record->watchers->firstWhere('id', request()->user()->id);
+            }
         }
 
         return false;
