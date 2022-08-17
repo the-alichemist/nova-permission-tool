@@ -72,30 +72,30 @@
                       <td>
                         <div>
                           <checkbox
-                            @click="handleChange(option.hidden.value)"
+                            @click="handleChange(option.visible.value)"
                             class="py-2 flex items-center m-auto"
                             :name="field.name"
-                            :checked="options[option.hidden.value]"
+                            :checked="options[option.visible.value]"
                           ></checkbox>
                         </div>
                       </td>
                       <td>
                         <div>
                           <checkbox
-                            @click="handleChange(option.readonly.value)"
+                            @click="handleChange(option.writable.value)"
                             class="py-2 flex items-center m-auto"
                             :name="field.name"
-                            :checked="options[option.readonly.value]"
+                            :checked="options[option.writable.value]"
                           ></checkbox>
                         </div>
                       </td>
-                      <td v-if="option.anonymous">
+                      <td v-if="option.identifiable">
                         <div>
                           <checkbox
-                            @click="handleChange(option.anonymous.value)"
+                            @click="handleChange(option.identifiable.value)"
                             class="py-2 flex items-center m-auto"
                             :name="field.name"
-                            :checked="options[option.anonymous.value]"
+                            :checked="options[option.identifiable.value]"
                           ></checkbox>
                         </div>
                       </td>
@@ -209,7 +209,7 @@ export default {
     fieldsViewStates: {},
     show: false,
     options: [],
-    fieldColumns: ["Fields", "Hidden", "Readonly", "Anonymous"],
+    fieldColumns: ["Fields", "Visible", "Writable", "Identifiable"],
     resourceColumns: [
       "Resource",
       "Create",
@@ -248,9 +248,9 @@ export default {
           );
           if (!fieldNameExists) {
             groups[option.resource].fields[option.display] = {
-              hidden: "",
-              readonly: "",
-              anonymous: null
+              visible: "",
+              writable: "",
+              identifiable: null
             };
           }
           groups[option.resource].fields[option.display][option.fieldType] =
@@ -258,7 +258,7 @@ export default {
         } else if (option.resource === "Tools") {
           this.tools.push(option);
           delete groups[option.resource];
-        } else if (option.resource === "Dashbaords") {
+        } else if (option.resource === "Dashboards") {
           this.dashboards.push(option);
           delete groups[option.resource];
         } else {

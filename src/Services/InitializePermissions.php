@@ -74,9 +74,9 @@ class InitializePermissions
             foreach ($resourceInstance->fields($request) as $field) {
                 if (in_array($field::class, ['Eminiarts\Tabs\Tabs', 'Laravel\Nova\Panel'])) {
                     $field->data = collect($field->data)->each(function ($nestedField) use ($resource) {
-                        $this->getHiddenFieldPermission($nestedField, $resource);
-                        $this->getReadOnlyFieldPermission($nestedField, $resource);
-                        $this->getAnonymousFieldPermission($nestedField, $resource);
+                        $this->getVisibleFieldPermission($nestedField, $resource);
+                        $this->getWritableOFieldPermission($nestedField, $resource);
+                        $this->getIdentifiableFieldPermission($nestedField, $resource);
                     });
 
                     continue;
@@ -85,41 +85,41 @@ class InitializePermissions
                 if (in_array($field->attribute, config('permission.permissions.excluded_fields'))) {
                     continue;
                 }
-                $this->getHiddenFieldPermission($field, $resource);
-                $this->getReadOnlyFieldPermission($field, $resource);
-                $this->getAnonymousFieldPermission($field, $resource);
+                $this->getVisibleFieldPermission($field, $resource);
+                $this->getWritableOFieldPermission($field, $resource);
+                $this->getIdentifiableFieldPermission($field, $resource);
             }
         }
     }
 
-    protected function getHiddenFieldPermission($field, $resource)
+    protected function getVisibleFieldPermission($field, $resource)
     {
         if ($field->attribute) {
-            $name = $field->attribute . ' (hidden)' . "-{$resource}";
+            $name = $field->attribute . ' (visible)' . "-{$resource}";
 
             if ($field->attribute === 'ComputedField') {
-                $name = $field->name . ' (hidden)' . "-{$resource}";
+                $name = $field->name . ' (visible)' . "-{$resource}";
             }
             $this->rolePermissions[] = $name;
         }
     }
 
-    protected function getReadOnlyFieldPermission($field, $resource)
+    protected function getWritableOFieldPermission($field, $resource)
     {
         if ($field->attribute) {
-            $name = $field->attribute . ' (readonly)' . "-{$resource}";
+            $name = $field->attribute . ' (writable)' . "-{$resource}";
 
             if ($field->attribute === 'ComputedField') {
-                $name = $field->name . ' (hidden)' . "-{$resource}";
+                $name = $field->name . ' (writable)' . "-{$resource}";
             }
             $this->rolePermissions[] = $name;
         }
     }
 
-    public function getAnonymousFieldPermission($field, $resource) 
+    public function getIdentifiableFieldPermission($field, $resource) 
     {
         if ($field->attribute && $field->attribute === 'notes') {
-            $name = $field->attribute . ' (anonymous)' . "-{$resource}";
+            $name = $field->attribute . ' (identifiable)' . "-{$resource}";
             $this->rolePermissions[] = $name;
         }
 

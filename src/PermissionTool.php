@@ -139,21 +139,17 @@ class PermissionTool extends Tool
         if ($field->attribute) {
             $field->readonly(function () use ($field, $resource) {
                 if ($field->attribute === 'ComputedField') {
-                    return Gate::check($field->name . ' (readonly)' . "-{$resource}");
+                    return !Gate::check($field->name . ' (writable)' . "-{$resource}");
                 }
 
-                return Gate::check($field->attribute . ' (readonly)' . "-{$resource}");
+                return !Gate::check($field->attribute . ' (writable)' . "-{$resource}");
             });
             $field->canSee(function () use ($field, $resource) {
-                $filteredRoles = Auth::user()->roles->filter(function ($role) use ($field, $resource) {
-                    if ($field->attribute === 'ComputedField') {
-                        return ! $role->hasPermissionTo($field->name . ' (hidden)' . "-{$resource}");
-                    }
+                if ($field->attribute === 'ComputedField') {
+                    return Gate::check($field->name . ' (visible)' . "-{$resource}");
+                }
 
-                    return ! $role->hasPermissionTo($field->attribute . ' (hidden)' . "-{$resource}");
-                });
-
-                return $filteredRoles->count();
+                return Gate::check($field->attribute . ' (visible)' . "-{$resource}");
             });
         }
 

@@ -49,11 +49,11 @@ class Permission extends Field
                 $permissionDisplay = substr($permission->name, 0, strrpos($permission->name, '-'));
                 $action = ! in_array($permissionDisplay, config('permission.permissions.resource'))
                     && ! in_array($permissionDisplay, collect(config('permission.permissions.custom_permissions'))->flatten()->toArray())
-                    && ! str_contains($permissionDisplay, '(readonly)')
-                    && ! str_contains($permissionDisplay, '(hidden)');
+                    && ! str_contains($permissionDisplay, '(writable)')
+                    && ! str_contains($permissionDisplay, '(visible)');
 
-                $field = str_contains($permissionDisplay, '(readonly)')
-                && str_contains($permissionDisplay, '(hidden)');
+                $field = str_contains($permissionDisplay, '(writable)')
+                && str_contains($permissionDisplay, '(visible)');
                 $fieldType = null;
 
                 if ($classIndex = strrpos($permissionDisplay, '\\')) {
@@ -66,29 +66,29 @@ class Permission extends Field
                     $group = 'Tools';
                     $action = false;
                 } elseif ($resourceClass == 'Laravel\Nova\Dashboard') {
-                    $group = 'Dashbaords';
+                    $group = 'Dashboards';
                     $action = false;
                 } elseif ($resourceClass == 'CustomPermission') {
                     $group = 'Custom Permission';
                     $action = false;
-                } elseif (str_contains($permissionDisplay, '(Readonly)')) {
-                    $permissionDisplay = str_replace('(Readonly)', '', $permissionDisplay);
+                } elseif (str_contains($permissionDisplay, '(Writable)')) {
+                    $permissionDisplay = str_replace('(Writable)', '', $permissionDisplay);
                     $group = $resourceClass::label();
                     $action = false;
                     $field = true;
-                    $fieldType = 'readonly';
-                } elseif (str_contains($permissionDisplay, '(Hidden)')) {
-                    $permissionDisplay = str_replace('(Hidden)', '', $permissionDisplay);
+                    $fieldType = 'writable';
+                } elseif (str_contains($permissionDisplay, '(Visible)')) {
+                    $permissionDisplay = str_replace('(Visible)', '', $permissionDisplay);
                     $group = $resourceClass::label();
                     $action = false;
                     $field = true;
-                    $fieldType = 'hidden';
-                } elseif (str_contains($permissionDisplay, '(Anonymous)')) {
-                    $permissionDisplay = str_replace('(Anonymous)', '', $permissionDisplay);
+                    $fieldType = 'visible';
+                } elseif (str_contains($permissionDisplay, '(Identifiable)')) {
+                    $permissionDisplay = str_replace('(Identifiable)', '', $permissionDisplay);
                     $group = $resourceClass::label();
                     $action = false;
                     $field = true;
-                    $fieldType = 'anonymous';
+                    $fieldType = 'identifiable';
                 } else {
                     // Normal Resource Permission
                     $group = $resourceClass::label();
