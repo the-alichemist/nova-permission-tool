@@ -250,7 +250,7 @@ export default {
             groups[option.resource].fields[option.display] = {
               visible: "",
               writable: "",
-              identifiable: null
+              identifiable: null,
             };
           }
           groups[option.resource].fields[option.display][option.fieldType] =
@@ -258,7 +258,7 @@ export default {
         } else if (option.resource === "Tools") {
           this.tools.push(option);
           delete groups[option.resource];
-        } else if (option.resource === "Dashboards") {
+        } else if (option.resource === "Nova Dashboard") {
           this.dashboards.push(option);
           delete groups[option.resource];
         } else {
@@ -338,6 +338,18 @@ export default {
       },
       deep: true,
     },
+  },
+  beforeUnmount() {
+    localStorage.setItem(
+      "permission.resourceAccordionState",
+      JSON.stringify(this.fieldsViewStates)
+    );
+  },
+
+  mounted() {
+    if (localStorage.getItem("permission.resourceAccordionState")) {
+      this.fieldsViewStates = JSON.parse(localStorage.getItem("permission.resourceAccordionState"));
+    }
   },
 };
 </script>
