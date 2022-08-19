@@ -14,9 +14,13 @@ trait AuthorizedQueries
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public static function indexQuery(NovaRequest $request, $query)
+    public static function indexQuery(NovaRequest $request, $query, $exempts = [])
     {
-        if (! $request->isResourceIndexRequest()) {
+        $bypassResourceIndexRequestCheck = false;
+        if (data_get($exempts, 'bypassResourceIndexRequestCheck')) {
+            $bypassResourceIndexRequestCheck = true;
+        }
+        if (! $request->isResourceIndexRequest()  && !$bypassResourceIndexRequestCheck) {
             return $query;
         }
 
