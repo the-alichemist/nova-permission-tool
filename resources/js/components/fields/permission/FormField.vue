@@ -40,10 +40,7 @@
                   :checked="isAllGroupedOptionsSelected(group.options)"
                   >&nbsp;</checkbox
                 >
-                <h2
-                  class="text-base cursor-pointer"
-                  @click="setFieldState(group.name)"
-                >
+                <h2 class="text-base cursor-pointer" @click="setFieldState(group.name)">
                   {{ group.name }}
                 </h2>
               </td>
@@ -65,11 +62,20 @@
                   <thead class="bg-gray-100">
                     <tr>
                       <th
-                        v-for="fieldColumn in fieldColumns"
+                        v-for="(fieldColumn, index) in fieldColumns"
                         :key="fieldColumn"
                         scope="col"
                         class="text-sm font-medium py-2"
                       >
+                        <checkbox
+                          v-if="index === 0"
+                          class="mr-1"
+                          @input="selectAllGroupedFields(group.fields)"
+                          :name="group.name"
+                          :checked="isAllGroupedFieldsSelected(group.fields)"
+                        >
+                          &nbsp;
+                        </checkbox>
                         {{ fieldColumn }}
                       </th>
                     </tr>
@@ -138,10 +144,7 @@
                           :name="field.name"
                           :checked="options[option.value]"
                         ></checkbox>
-                        <label
-                          :for="field.name"
-                          v-text="option.display"
-                        ></label>
+                        <label :for="field.name" v-text="option.display"></label>
                       </div>
                     </div>
                   </div>
@@ -268,8 +271,7 @@ export default {
               identifiable: null,
             };
           }
-          groups[option.resource].fields[option.display][option.fieldType] =
-            option;
+          groups[option.resource].fields[option.display][option.fieldType] = option;
         } else if (option.resource === "Tools") {
           this.tools.push(option);
           delete groups[option.resource];
@@ -322,6 +324,45 @@ export default {
       this.options[key] = !this.options[key];
     },
 
+    isAllGroupedFieldsSelected(fields) {
+      let _this = this;
+      let result = true;
+      _.each(fields, function (field) {
+        if (
+          _this.options[field.visible.value] == false &&
+          _this.options[field.writable.value] == false
+        ) {
+          if (field.identifiable && _this.options[field.identifiable.value] == true) {
+            return;
+          }
+          result = false;
+          return false;
+        }
+      });
+      return result;
+    },
+    selectAllGroupedFields(fields) {
+      let _this = this;
+      if (this.isAllGroupedFieldsSelected(fields)) {
+        _.each(fields, function (field) {
+          _this.options[field.visible.value] = false;
+          _this.options[field.writable.value] = false;
+
+          if (field.identifiable) {
+            _this.options[field.identifiable.value] = false;
+          }
+        });
+        return;
+      }
+      _.each(fields, function (field) {
+        _this.options[field.visible.value] = true;
+        _this.options[field.writable.value] = true;
+
+        if (field.identifiable) {
+          _this.options[field.identifiable.value] = true;
+        }
+      });
+    },
     isAllGroupedOptionsSelected(options) {
       let _this = this;
       let result = true;
