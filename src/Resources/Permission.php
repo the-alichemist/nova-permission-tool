@@ -8,8 +8,8 @@ use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\DateTime;
+use Armincms\Fields\BelongsToMany;
 use Laravel\Nova\Fields\MorphToMany;
-use Laravel\Nova\Fields\BelongsToMany;
 use Spatie\Permission\PermissionRegistrar;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -78,7 +78,7 @@ class Permission extends Resource
             })->canSee(function () {
                 return is_array(__('PermissionTool::permissions.display_names'));
             }),
-            Text::make('Roles Count')->withMeta(['value' => count($this->roles)])->exceptOnForms(),
+            Text::make('Roles Count')->withMeta(['value' => $this->roles()->count()])->exceptOnForms(),
 
             DateTime::make(__('PermissionTool::permissions.created_at'), 'created_at')->exceptOnForms(),
             DateTime::make(__('PermissionTool::permissions.updated_at'), 'updated_at')->exceptOnForms(),
