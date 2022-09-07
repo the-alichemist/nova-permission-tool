@@ -65,7 +65,6 @@ class Role extends Resource
      */
     public function fields(NovaRequest $request)
     {
-        (new InitializePermissions())->handle($request);
         $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
 
         $fields = [
