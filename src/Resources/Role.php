@@ -80,10 +80,10 @@ class Role extends Resource
 
             Text::make('users count')->withMeta(['value' => $this->users()->count()])->exceptOnForms(),
             Text::make('permissions count')->withMeta(['value' => $this->permissions()->count()])->exceptOnForms(),
-            // DateTime::make(__('PermissionTool::roles.created_at'), 'created_at')->exceptOnForms(),
-            // DateTime::make(__('PermissionTool::roles.updated_at'), 'updated_at')->exceptOnForms(),
+            DateTime::make(__('PermissionTool::roles.created_at'), 'created_at')->exceptOnForms(),
+            DateTime::make(__('PermissionTool::roles.updated_at'), 'updated_at')->exceptOnForms(),
 
-            // BelongsToMany::make(__('PermissionTool::resources.Permissions'), 'permissions', Permission::class),
+            BelongsToMany::make(__('PermissionTool::resources.Permissions'), 'permissions', Permission::class),
             MorphToMany::make($userResource::label(), 'users', $userResource),
         ];
 

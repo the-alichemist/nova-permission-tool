@@ -30,6 +30,10 @@ After the migration has been published you can create the role- and permission-t
 php artisan migrate
 ```
 
+```bash
+php artisan permissions:initialize
+```
+
 ## Usage
 
 1. You must register the tool with Nova. This is typically done in the tools method of the NovaServiceProvider, in app/Providers/NovaServiceProvider.php.
