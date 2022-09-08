@@ -34,6 +34,12 @@ class PermissionTool extends Tool
             $this->permissionResource,
         ]);
 
+        $lock = Cache::lock('permissionsInit', 86400);
+
+        if ($lock->get()) {
+            (new InitializePermissions())->handle((new NovaRequest()));
+        }
+
         Nova::script('PermissionTool', __DIR__ . '/../dist/js/tool.js');
         Nova::style('PermissionTool', __DIR__ . '/../dist/css/tool.css');
 
