@@ -8,7 +8,6 @@ use Laravel\Nova\Events\ServingNova;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use DigitalCloud\PermissionTool\Http\Middleware\Authorize;
-use DigitalCloud\PermissionTool\Commands\InitializePermissions;
 
 class ToolServiceProvider extends ServiceProvider
 {
@@ -36,12 +35,6 @@ class ToolServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__. '/../migrations' => database_path('migrations')
         ], 'permission-tool-migrations');
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                InitializePermissions::class,
-            ]);
-        }
 
         // Super admin all permissions
         Gate::before(function ($user, $ability) {
