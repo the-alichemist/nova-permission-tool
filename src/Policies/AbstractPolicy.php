@@ -54,7 +54,7 @@ class AbstractPolicy
 
     public function viewAny($user): bool
     {
-        if ($this->check('view') || $this->check('viewAny')) {
+        if ($this->check('view') || $this->check('viewAny') || $this->check('create')) {
             return true;
         }
 
