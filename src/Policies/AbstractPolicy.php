@@ -29,18 +29,24 @@ class AbstractPolicy
         $userIdCol = config('permission.column_names.user_id');
         $hasUserAttribute = array_key_exists($userIdCol, $record->getAttributes());
 
-        if (Gate::check($permission)) {
+        if ($record && Gate::check($permission)) {
             if ($hasUserAttribute && $record->$userIdCol == request()->user()->id) {
                 return true;
             }
 
-            if (method_exists($record, 'assignees')) {
-                return $record->assignees->firstWhere('id', request()->user()->id);
+            if (method_exists($record, 'assignees') && $record->assignees->firstWhere('id', request()->user()->id)) {
+                return true;
             }
 
-            if (method_exists($record, 'watchers')) {
-                return $record->watchers->firstWhere('id', request()->user()->id);
+            if (method_exists($record, 'watchers') && $record->watchers->firstWhere('id', request()->user()->id)) {
+                return true;
             }
+
+            if ($resource::$model == config('permission.models.user') && request()->user()->id === $record->id) {
+                return true;
+            }
+
+            return false;
         }
 
         return false;
