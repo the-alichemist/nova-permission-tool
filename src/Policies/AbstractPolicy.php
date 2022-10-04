@@ -30,11 +30,7 @@ class AbstractPolicy
         $hasUserAttribute = array_key_exists($userIdCol, $record->getAttributes());
 
         if (Gate::check($permission)) {
-            if (! $hasUserAttribute) {
-                return true;
-            }
-
-            if ($record->$userIdCol == request()->user()->id) {
+            if ($hasUserAttribute && $record->$userIdCol == request()->user()->id) {
                 return true;
             }
 
