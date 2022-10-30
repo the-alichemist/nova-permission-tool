@@ -17,9 +17,6 @@ return new class extends Migration
         $tableNames = config('permission.table_names');
         $columnNames = config('permission.column_names');
 
-        if (! $teams) {
-            return;
-        }
         if (empty($tableNames)) {
             throw new \Exception('Error: config/permission.php not loaded. Run [php artisan config:clear] and try again.');
         }
