@@ -26,6 +26,8 @@ return new class extends Migration
                 $table->dropPrimary();
                 $table->unique([$columnNames['team_foreign_key'], PermissionRegistrar::$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
                     'model_has_permissions_permission_model_type_primary');
+            });
+            Schema::table($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
                 $table->id()->before(PermissionRegistrar::$pivotPermission);
             });
         }
@@ -35,6 +37,8 @@ return new class extends Migration
                 $table->dropPrimary();
                 $table->unique([$columnNames['team_foreign_key'], PermissionRegistrar::$pivotRole, $columnNames['model_morph_key'], 'model_type'],
                     'model_has_roles_role_model_type_primary');
+            });
+            Schema::table($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
                 $table->id()->before(PermissionRegistrar::$pivotRole);
             });
         }
