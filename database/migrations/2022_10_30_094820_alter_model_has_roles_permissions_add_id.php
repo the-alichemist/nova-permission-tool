@@ -23,12 +23,18 @@ return new class extends Migration
 
         if (! Schema::hasColumn($tableNames['model_has_permissions'], 'id')) {
             Schema::table($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
+                $table->dropPrimary();
+                $table->unique([$columnNames['team_foreign_key'], PermissionRegistrar::$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary');
                 $table->id()->before(PermissionRegistrar::$pivotPermission);
             });
         }
 
         if (! Schema::hasColumn($tableNames['model_has_roles'], 'id')) {
             Schema::table($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
+                $table->dropPrimary();
+                $table->unique([$columnNames['team_foreign_key'], PermissionRegistrar::$pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary');
                 $table->id()->before(PermissionRegistrar::$pivotRole);
             });
         }
