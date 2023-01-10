@@ -8,7 +8,6 @@ use Laravel\Nova\Fields\ID;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\DateTime;
-use App\Nova\User;
 use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Fields\BelongsToMany;
 use Spatie\Permission\PermissionRegistrar;
@@ -66,6 +65,8 @@ class Role extends Resource
      */
     public function fields(NovaRequest $request)
     {
+        $userResource = Nova::resourceForModel(getModelForGuard($this->guard_name));
+
         $fields = [
             ID::make()->sortable(),
 
@@ -82,7 +83,7 @@ class Role extends Resource
             DateTime::make(__('PermissionTool::roles.updated_at'), 'updated_at')->exceptOnForms(),
 
             BelongsToMany::make(__('PermissionTool::resources.Permissions'), 'permissions', Permission::class),
-            MorphToMany::make(User::label(), 'users', User::class),
+            MorphToMany::make($userResource::label(), 'users', $userResource),
         ];
 
         return $fields;
