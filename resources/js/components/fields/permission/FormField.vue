@@ -17,7 +17,7 @@
         </div>
       </div>
       <table class="table-fixed border-collapse">
-        <thead class="bg-gray-100 text-black">
+        <thead class="bg-gray-100 text-black sticky top-0 z-50">
           <tr class="text-base">
             <th
               v-for="resourceColumn in resourceColumns"
